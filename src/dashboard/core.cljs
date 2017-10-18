@@ -9,15 +9,28 @@
 
 (defonce app-state (atom {:text "Hello world!"}))
 
+
 (rum/defc geo-zones [zones]
   [:ul
    (for [z zones]
      [:li {:key (:id z)} (:label z)])])
 
+
 (rum/defc transport-groups [groups]
   [:ul
    (for [g groups]
      [:li {:key (:id g)} (:title g)])])
+
+
+(rum/defc tracker-header []
+  [:.header
+   [:span "Автомобиль"]
+   [:span "Статус"]
+   [:span "Интервал"]
+   [:span "Геозона"]
+   [:span "Время в зоне"]
+   [:span "Въезд"]])
+
 
 (rum/defc tracker [tr]
   [:.tracker {:key (:id tr)}
@@ -28,15 +41,8 @@
    [:span (:event_time tr)]
    [:span (:event_time tr)]])
 
-(rum/defc tablo [trackers]
-  [:#tablo
-   [:.header
-    [:span "Автомобиль"]
-    [:span "Статус"]
-    [:span "Интервал"]
-    [:span "Геозона"]
-    [:span "Время в зоне"]
-    [:span "Въезд"]]
+(rum/defc trackers [trackers]
+  [:.body
    (for [t trackers]
      (tracker t))])
 
@@ -57,14 +63,18 @@
                  {:id 2 :label "с192во777 борт 20т 1АК" :status_movement "parked" :event_time "2017-10-11 10:38:19" :zone_label_current "480 КЖИ - погр."}
                  {:id 3 :label "а446хв77 У-230 1АК" :status_movement "parked" :event_time "2017-10-11 10:38:19" :zone_label_current "480 КЖИ - погр."}])
 
-(rum/defc app []
-  [:.content
-   [:.zones (geo-zones t-zones)]
-   [:.groups (transport-groups t-groups)]
-   (tablo t-trackers)])
 
-(rum/mount (app)
-           (-> js/document (.getElementById "app")))
+(rum/defc app []
+  [:#content
+   [:#zones (geo-zones t-zones)]
+   [:#groups (transport-groups t-groups)]
+   [:#tablo
+    (tracker-header)
+    (trackers t-trackers)]])
+
+
+;(when-let [element (-> js/document (.getElementById "app"))]
+;  (rum/mount (app) element))
 
 (defn on-js-reload [])
   ;(swap! app-state update-in [:__figwheel_counter] inc))

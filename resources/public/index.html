@@ -1,16 +1,87 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/style.css" rel="stylesheet" type="text/css">
-    <link rel="icon" href="https://clojurescript.org/images/cljs-logo-icon-32.png">
-  </head>
-  <body>
-    <div id="app">
-      <h2>Figwheel template</h2>
-      <p>Checkout your developer console.</p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="https://clojurescript.org/images/cljs-logo-icon-32.png">
+  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div id="app" class="container-fluid debug">
+  <div class="row">
+    <div id="accordion" role="tablist" class="col">
+      <div class="card">
+        <div class="card-header" role="tab">
+          <a href="#zones" data-toggle="collapse" aria-expanded="false" aria-controls="zones">Геозоны</a>
+        </div>
+        <div id="zones" class="collapse" role="tabpanel" data-parent="#accordion">
+          <ul class="card-body">
+            <li>480 КЖИ - погр.</li>
+            <li>Балашиха - разгр.</li>
+            <li>Боброво - разгр.</li>
+            <li>Бунинские луга - разгр.</li>
+            <li>Ново-Куркино (Химки) - разгр.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" role="tab">
+          <a href="#groups" data-toggle="collapse" aria-expanded="false" aria-controls="groups">Группы транспорта</a>
+        </div>
+        <div id="groups" class="collapse" role="tabpanel" data-parent="#accordion">
+          <ul class="card-body">
+            <li>-Инлоудер</li>
+            <li>-Лангендорф</li>
+            <li>-Панелевоз У-148 12,5т</li>
+            <li>Погрузчики и технологические</li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <script src="js/compiled/main.js" type="text/javascript"></script>
-  </body>
+    <div id="tablo" class="col-9">
+      <table class="table table-sm">
+        <thead class="thead-default">
+          <tr>
+            <th>Автомобиль</th>
+            <th>Статус</th>
+            <th>Геозона</th>
+            <th>Время в зоне</th>
+            <th>Въезд</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>о230ес50 лангендорф Щелково</td>
+          <td>parked</td>
+          <td>480 КЖИ - погр.</td>
+          <td>08:19</td>
+          <td>2017-10-11 10:38:19</td>
+        </tr>
+        <tr>
+          <td>о230ес50 лангендорф Щелково</td>
+          <td>parked</td>
+          <td>480 КЖИ - погр.</td>
+          <td>08:19</td>
+          <td>2017-10-11 10:38:19</td>
+        </tr>
+        <tr>
+          <td>о230ес50 лангендорф Щелково</td>
+          <td>parked</td>
+          <td>480 КЖИ - погр.</td>
+          <td>08:19</td>
+          <td>2017-10-11 10:38:19</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/jquery-slim.min.js" type="text/javascript"></script>
+<script src="js/popper.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/compiled/main.js" type="text/javascript"></script>
+</body>
 </html>

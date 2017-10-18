@@ -6,6 +6,11 @@ FIXME: Write a one-line description of your library/project.
 
 FIXME: Write a paragraph about the library/project and highlight its goals.
 
+## Dev
+### Run tasks from Procfile
+
+rlwrap lein cooper
+
 ## Setup
 
 To get an interactive development environment run:
@@ -30,7 +35,7 @@ To create a production build run:
     lein do clean, cljsbuild once min
 
 And open your browser in `resources/public/index.html`. You will not
-get live reloading, nor a REPL. 
+get live reloading, nor a REPL.
 
 ## License
 
