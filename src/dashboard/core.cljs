@@ -1,5 +1,11 @@
 (ns dashboard.core
-    (:require [rum.core :as rum]))
+    (:require [rum.core :as rum]
+              [cljs-time.core :as t]
+              [cljs-time.coerce :as tc]
+              [cljs-time.format :as tf]
+              [goog.string :as gstring]
+              [clojure.string :as string]
+              [dashboard.db.core :as db]))
 
 (enable-console-print!)
 
@@ -32,18 +38,61 @@
     [:th "Въезд"]]])
 
 
+(defn to-sec [time-int]
+  (js/Math.trunc (/ time-int 1000)))
+
+
+(defn to-sec-from-str [time-str]
+  (let [t (tf/parse-local time-str)]
+    (to-sec t)))
+
+;(require '[goog.string :as gstring])
+;(require '[clojure.string :as string])
+;(float 59)
+;(gstring/format "%02d" 19)
+;(string/join " " [1 2 3])
+
+
+(def one-min 60)
+(def one-hour (* 60 one-min))
+(def one-day (* 24 one-hour))
+
+;(js/Math.floor (/ 86401 one-day))
+;(/ 86399 one-day)
+
+(defn format-sec [sec]
+  (let [dd (/ sec one-day)
+        hh (/ (rem sec one-day) one-hour)
+        mm (/ (rem (rem sec one-day) one-hour) one-min)
+        ss (rem (rem (rem sec one-day) one-hour) one-min)
+        in-day (string/join ":" (map (comp (partial gstring/format "%02d") js/Math.floor) [hh mm ss]))]
+    in-day))
+
+
+;(format-sec 86399)
+
+(rum/defcs timer-from < (rum/local (tc/to-long (t/now)) ::now-key)
+  [state time-str]
+  (let [sec (to-sec-from-str time-str)
+        now-atom (::now-key state)
+        now-sec (to-sec @now-atom)]
+    [:span (- now-sec sec)]))
+
+
 (rum/defc tracker < {:key-fn (fn [tr] (str (:id tr)))} [tr]
   [:tr
    [:td (:label tr)]
    [:td (:status_movement tr)]
    [:td (:zone_label_current tr)]
-   [:td "08:20"]
+   [:td (timer-from (:event_time tr))]
    [:td (:event_time tr)]])
+
 
 (rum/defc trackers [trs]
   [:tbody
    (for [t trs]
      (tracker t))])
+
 
 (rum/defc tablo [trs]
   [:table {:class "table table-sm"}
@@ -51,43 +100,26 @@
    (trackers trs)])
 
 
-(def t-zones [{:id "z0" :label "480 КЖИ - погр."}
-              {:id "z1" :label "Балашиха - разгр."}
-              {:id "z2" :label "Боброво - разгр."}
-              {:id "z3" :label "Бунинские луга - разгр."}
-              {:id "z4" :label "Ново-Куркино (Химки) - разгр."}])
-
-(def t-groups [{:id "g0" :title "-Инлоудер"}
-               {:id "g1" :title "-Лангендорф"}
-               {:id "g2" :title "-Панелевоз У-148 12,5т"}
-               {:id "g3" :title "Погрузчики и технологические"}])
-
-(def t-trackers [{:id "t0" :label "о230ес50 лангендорф Щелково" :status_movement "parked" :event_time "2017-10-11 10:38:19" :zone_label_current "480 КЖИ - погр."}
-                 {:id "t1" :label "у901еу750 У-230 Щелково" :status_movement "parked" :event_time "2017-10-11 10:38:19" :zone_label_current "480 КЖИ - погр."}
-                 {:id "t2" :label "с192во777 борт 20т 1АК" :status_movement "parked" :event_time "2017-10-11 10:38:19" :zone_label_current "480 КЖИ - погр."}
-                 {:id "t3" :label "а446хв77 У-230 1АК" :status_movement "parked" :event_time "2017-10-11 10:38:19" :zone_label_current "480 КЖИ - погр."}])
-
-
-;(rum/defc app []
-;  [:#content
-;   [:#zones (geo-zones t-zones)]
-;   [:#groups (transport-groups t-groups)]
-;   [:#tablo
-;    (tracker-header)
-;    (trackers t-trackers)]])
-
-
-;(when-let [element (-> js/document (.getElementById "app"))]
-;  (rum/mount (app) element))
-
 (when-let [element (-> js/document (.getElementById "zones"))]
-  (rum/mount (geo-zones t-zones) element))
+  (rum/mount (geo-zones db/zones) element))
 
 (when-let [element (-> js/document (.getElementById "groups"))]
-  (rum/mount (transport-groups t-groups) element))
+  (rum/mount (transport-groups db/groups) element))
 
 (when-let [element (-> js/document (.getElementById "tablo"))]
-  (rum/mount (tablo t-trackers) element))
+  (rum/mount (tablo db/trackers) element))
 
 (defn on-js-reload [])
   ;(swap! app-state update-in [:__figwheel_counter] inc))
+
+;(require '[cljs-time.coerce :as tc])
+;(require '[cljs-time.format :as tf])
+;(tc/from-long (tc/to-long (tf/parse-local "2017-10-19 15:48:00")))
+;(tc/to-long (t/now))
+;(t/now)
+;(/ (tc/to-long (t/now)) 1000)
+;
+;(js/Date.)
+;(t/now)
+;(tc/from-long (tc/to-long "2017-10-19 15:21:00"))
+;(t/to-utc-time-zone (tc/from-string "2017-10-19 15:21:00"))
