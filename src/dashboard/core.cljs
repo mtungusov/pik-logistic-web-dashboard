@@ -66,17 +66,20 @@
         mm (/ (rem (rem sec one-day) one-hour) one-min)
         ss (rem (rem (rem sec one-day) one-hour) one-min)
         in-day (string/join ":" (map (comp (partial gstring/format "%02d") js/Math.floor) [hh mm ss]))]
-    in-day))
+    (if (>= dd 1)
+      (str (js/Math.floor dd) "д. " in-day)
+      in-day)))
 
 
-;(format-sec 86399)
+;(format-sec 12386400)
 
 (rum/defcs timer-from < (rum/local (tc/to-long (t/now)) ::now-key)
   [state time-str]
   (let [sec (to-sec-from-str time-str)
         now-atom (::now-key state)
-        now-sec (to-sec @now-atom)]
-    [:span (- now-sec sec)]))
+        now-sec (to-sec @now-atom)
+        dur (- now-sec sec)]
+    [:span (format-sec dur)]))
 
 
 (rum/defc tracker < {:key-fn (fn [tr] (str (:id tr)))} [tr]
