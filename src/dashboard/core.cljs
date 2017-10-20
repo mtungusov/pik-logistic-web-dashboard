@@ -79,6 +79,7 @@
         now-atom (::now-key state)
         now-sec (to-sec @now-atom)
         dur (- now-sec sec)]
+    (js/setTimeout #(reset! now-atom (tc/to-long (t/now))))
     [:span (format-sec dur)]))
 
 

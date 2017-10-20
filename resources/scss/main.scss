@@ -1,3 +1,33 @@
 .debug {
   border: 1px solid red;
 }
+
+#accordion {
+  .card-header {
+    a {
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      span {
+        display: inline;
+
+        &.oi {
+          display: none;
+        }
+      }
+
+      &.collapsed {
+        span {
+          display: none;
+
+          &.oi {
+            display: inline;
+          }
+        }
+
+      }
+    }
+  }
+}
