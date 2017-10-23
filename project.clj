@@ -11,7 +11,8 @@
                  [org.clojure/core.async  "0.3.443"]
                  [rum "0.10.8"]
                  [com.andrewmcveigh/cljs-time "0.5.0"]
-                 [datascript "0.16.2"]]
+                 [datascript "0.16.2"]
+                 [cljs-http "0.1.43"]]
 
   :plugins [[lein-figwheel "0.5.13"]
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]

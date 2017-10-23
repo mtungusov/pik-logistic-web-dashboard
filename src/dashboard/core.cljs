@@ -5,6 +5,7 @@
               [cljs-time.format :as tf]
               [goog.string :as gstring]
               [clojure.string :as string]
+              [datascript.core :as d]
               [dashboard.db.core :as db]))
 
 (enable-console-print!)
@@ -83,13 +84,13 @@
     [:span (format-sec dur)]))
 
 
-(rum/defc tracker < {:key-fn (fn [tr] (str (:id tr)))} [tr]
+(rum/defc tracker < {:key-fn (fn [tr] (str (:tracker/id tr)))} [tr]
   [:tr
-   [:td (:label tr)]
-   [:td (:status_movement tr)]
-   [:td (:zone_label_current tr)]
-   [:td (timer-from (:event_time tr))]
-   [:td (:event_time tr)]])
+   [:td (:tracker/label tr)]
+   [:td (:tracker/status_movement tr)]
+   [:td (:tracker/zone_label_current tr)]
+   [:td (timer-from (:tracker/event_time tr))]
+   [:td (:tracker/event_time tr)]])
 
 
 (rum/defc trackers [trs]
@@ -110,11 +111,22 @@
 (when-let [element (-> js/document (.getElementById "groups"))]
   (rum/mount (transport-groups db/groups) element))
 
-(when-let [element (-> js/document (.getElementById "tablo"))]
-  (rum/mount (tablo db/trackers) element))
+(defn render [db]
+  (when-let [element (-> js/document (.getElementById "tablo"))]
+    (rum/mount (tablo (db/trackers db)) element)))
+
+(d/listen! db/conn :render
+  (fn [tx-report]
+    (render (:db-after tx-report))))
+
+(render @db/conn)
 
 (defn on-js-reload [])
   ;(swap! app-state update-in [:__figwheel_counter] inc))
+
+;(d/transact! db/conn [{:tracker/id "t2" :tracker/status_movement "stopped"}])
+;(d/transact! db/conn [{:tracker/id "t0" :tracker/status_movement "moved"}])
+
 
 ;(require '[cljs-time.coerce :as tc])
 ;(require '[cljs-time.format :as tf])
