@@ -17,7 +17,7 @@
 
 
 (defn convert-tracker-for-db [tracker order-atom]
-  (let [id (:id tracker)
+  (let [id (str "t-"(:id tracker))
         label (:label tracker)
         status_movement (:status_movement tracker)
         event_time (:event_time tracker)
@@ -38,7 +38,7 @@
 
 
 (defn convert-zone-for-db [zone]
-  (let [id (:zone_id zone)
+  (let [id (str "z-"(:zone_id zone))
         label (:zone_label zone)]
     (when-not (or (nil? label) (nil? id))
       {:zone/id id
@@ -47,7 +47,7 @@
 ;(convert-zone-for-db {:zone_id 0 :zone_label "one"})
 
 (defn convert-group-for-db [group]
-  (let [id (:group_id group)
+  (let [id (str "g-"(:group_id group))
         title (:group_title group)]
     (when-not (or (nil? title) (nil? id))
       {:group/id id
