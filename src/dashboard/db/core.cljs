@@ -8,7 +8,7 @@
              :tracker/status_movement {}
              :tracker/status_connection {}
              :tracker/zone_label_current {:db/index true}
-             :tracker/group_title {}
+             :tracker/group_title {:db/index true}
 
              :zone/id {:db/unique :db.unique/identity}
              :zone/label {:db/index true}
