@@ -19,22 +19,28 @@
 (defn convert-tracker-for-db [tracker order-atom]
   (let [id (str "t-"(:id tracker))
         label (:label tracker)
-        status_movement (:status_movement tracker)
         event_time (:event_time tracker)
+        status_last_update_time (:status_last_update tracker)
+        status_movement (:status_movement tracker)
+        status_connection (:status_connection tracker)
         zone_label_current (:zone_label_current tracker)
         zone_label_prev (:zone_label_prev tracker)
         zone_parent_label (:zone_parent_label tracker)
-        last_parent_inzone_time (:last_parent_inzone_time tracker)]
+        last_parent_inzone_time (:last_parent_inzone_time tracker)
+        group_title (:group_title tracker)]
     (swap! order-atom inc)
     {:tracker/id (str id)
      :tracker/order @order-atom
      :tracker/label label
-     :tracker/status_movement status_movement
      :tracker/event_time event_time
+     :tracker/status_last_update_time status_last_update_time
+     :tracker/status_movement status_movement
+     :tracker/status_connection status_connection
      :tracker/zone_label_current (nil-to-str zone_label_current)
      :tracker/zone_label_prev (nil-to-str zone_label_prev)
      :tracker/zone_parent_label (nil-to-str zone_parent_label)
-     :tracker/last_parent_inzone_time (nil-to-str last_parent_inzone_time)}))
+     :tracker/last_parent_inzone_time (nil-to-str last_parent_inzone_time)
+     :tracker/group_title group_title}))
 
 
 (defn convert-zone-for-db [zone]
