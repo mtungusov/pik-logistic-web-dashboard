@@ -1,19 +1,11 @@
 (ns dashboard.core
     (:require [rum.core :as rum]
-              [cljs-time.core :as t]
-              [cljs-time.coerce :as tc]
-              [cljs-time.format :as tf]
-              [goog.string :as gstring]
-              [clojure.string :as string]
               [datascript.core :as d]
               [dashboard.db.core :as db]
-              [dashboard.api.core :as api]))
+              [dashboard.api.core :as api]
+              [dashboard.utils.core :refer [to-sec to-sec-from-str format-time format-sec now-int]]))
 
 (enable-console-print!)
-
-;(println "This text is printed from src/dashboard/core.cljs. Go ahead and edit it and see reloading in action.")
-;
-;; define your app data so that it doesn't get over-written on reload
 
 (defonce app-state (atom {:text "Hello world!"}))
 
@@ -40,58 +32,20 @@
     [:th "Въезд/Выезд"]]])
 
 
-(defn to-sec [time-int]
-  (js/Math.trunc (/ time-int 1000)))
-
-
-(defn to-sec-from-str [time-str]
-  (let [t (tf/parse-local time-str)]
-    (to-sec t)))
-
-(defn format-time [time-str]
-  (let [t (tf/parse-local time-str)]
-    (tf/unparse (tf/formatter "yyyy-MM-dd HH:mm") t)))
-
-;(format-time "2017-10-24 10:47:56")
-;(require '[goog.string :as gstring])
-;(require '[clojure.string :as string])
-;(float 59)
-;(gstring/format "%02d" 19)
-;(string/join " " [1 2 3])
-
-
-(def one-min 60)
-(def one-hour (* 60 one-min))
-(def one-day (* 24 one-hour))
-
-;(js/Math.floor (/ 86401 one-day))
-;(/ 86399 one-day)
-
-(defn format-sec [sec]
-  (let [dd (/ sec one-day)
-        hh (/ (rem sec one-day) one-hour)
-        mm (/ (rem (rem sec one-day) one-hour) one-min)
-        ss (rem (rem (rem sec one-day) one-hour) one-min)
-        in-day (string/join ":" (map (comp (partial gstring/format "%02d") js/Math.floor) [hh mm]))]
-    (if (>= dd 1)
-      (str (js/Math.floor dd) "д. " in-day)
-      in-day)))
-
-
-;(format-sec 12386400)
 (defn set-time-class [dur]
   (cond
     (>= dur (* 120 60)) "badge badge-danger"
     (>= dur (* 60 60)) "badge badge-warning"
     :else "badge badge-light"))
 
-(rum/defcs timer-from < (rum/local (tc/to-long (t/now)) ::now-key)
+
+(rum/defcs timer-from < (rum/local (now-int) ::now-key)
   [state time-str]
   (let [sec (to-sec-from-str time-str)
         now-atom (::now-key state)
         now-sec (to-sec @now-atom)
         dur (- now-sec sec)]
-    (js/setTimeout #(reset! now-atom (tc/to-long (t/now))) 10000)
+    (js/setTimeout #(reset! now-atom (now-int)) 10000)
     [:span {:class (set-time-class dur)} (format-sec dur)]))
 
 (rum/defc prev-zone-label [cur prev time]
@@ -152,12 +106,6 @@
    (trackers trs)])
 
 
-;(when-let [element (-> js/document (.getElementById "zones"))]
-;  (rum/mount (geo-zones db/zones) element))
-
-;(when-let [element (-> js/document (.getElementById "groups"))]
-;  (rum/mount (transport-groups (db/groups db)) element))
-
 (defn render [db]
   (when-let [element (-> js/document (.getElementById "zones"))]
     (rum/mount (geo-zones (db/zones db)) element))
@@ -183,14 +131,3 @@
 
 ;(db/groups @db/conn)
 
-;(require '[cljs-time.coerce :as tc])
-;(require '[cljs-time.format :as tf])
-;(tc/from-long (tc/to-long (tf/parse-local "2017-10-19 15:48:00")))
-;(tc/to-long (t/now))
-;(t/now)
-;(/ (tc/to-long (t/now)) 1000)
-;
-;(js/Date.)
-;(t/now)
-;(tc/from-long (tc/to-long "2017-10-19 15:21:00"))
-;(t/to-utc-time-zone (tc/from-string "2017-10-19 15:21:00"))
