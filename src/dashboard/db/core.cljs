@@ -24,7 +24,7 @@
         items (d/q q db)]
     (sort-by :tracker/order items)))
 
-;(trackers @conn)
+;(first (trackers @conn))
 
 
 (defn groups [db]
@@ -62,3 +62,8 @@
 
 ;(d/q '[:find ?e :in $ :where [?e :zone/id]] @conn)
 ;(sort-by :zone/label (d/q '[:find [(pull ?e [*]) ...] :in $ :where [?e :zone/id]] @conn))
+;(d/q '[:find [(pull ?e [*]) ...] :in $
+;       :where [?e :tracker/id]
+;              [?e :tracker/zone_label_current ?lz]
+;              [(contains? #{"Балашиха - разгр." "480 КЖИ - погр."} ?lz)]]
+;      @conn)

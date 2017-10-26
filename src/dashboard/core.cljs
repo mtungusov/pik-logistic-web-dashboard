@@ -9,11 +9,31 @@
 
 (defonce app-state (atom {:text "Hello world!"}))
 
+(defonce checked-zones (atom #{}))
+
+(rum/defc checkbox < rum/reactive
+  [label value *ref]
+  (let [vals (rum/react *ref)
+        checked (contains? vals value)]
+    [:label
+     [:input {:type "checkbox"
+              :checked checked
+              :value value
+              :on-click (fn [_]
+                          (if checked
+                            (swap! *ref disj value)
+                            (swap! *ref conj value))
+                          (prn @*ref))}]
+     label]))
+
 
 (rum/defc geo-zones [zones]
-  [:ul {:class "card-body"}
+  [:div {:class "card-body"}
    (for [z zones]
-     [:li {:key (:zone/id z)} (:zone/label z)])])
+     [:div {:class "form-check" :key (:zone/id z)}
+      [:label {:class "form-check-label"}
+       [:input {:type "checkbox" :class "form-check-input" :value (:zone/label z)}]
+       (:zone/label z)]])])
 
 
 (rum/defc transport-groups [groups]
@@ -48,15 +68,9 @@
     (js/setTimeout #(reset! now-atom (now-int)) 10000)
     [:span {:class (set-time-class dur)} (format-sec dur)]))
 
-(rum/defc prev-zone-label [cur prev time]
-  (when (and (empty? cur) (not-empty prev))
-    [:div
-     [:span {:class "badge badge-info"} "Выезд:"]
-     [:span {:class "badge badge-secondary"} prev]]))
-
-(rum/defc prev-zone-time [cur prev time]
-  (when (and (empty? cur) (not-empty prev))
-    [:span {:class "badge badge-secondary"} (format-time time)]))
+;(rum/defc prev-zone-time [cur prev time]
+;  (when (and (empty? cur) (not-empty prev))
+;    [:span {:class "badge badge-secondary"} (format-time time)]))
 
 (defn get-event-time [cur-time parent-time cur parent]
   (if (and (not-empty parent)
@@ -80,18 +94,22 @@
         parent-label (:tracker/zone_parent_label tr)
         prev-label (:tracker/zone_label_prev tr)
         cur-event-time (get-event-time event-time parent-time label parent-label)
-        status (get-status (:tracker/status_movement tr))]
+        status (get-status (:tracker/status_movement tr))
+        group-title (:tracker/group_title tr)]
     [:tr
-     [:td [:span {:class "badge badge-light"} tracker-label]]
+     [:td {:class "tracker-label"}
+          [:span {:class "group-title"} (str group-title ": ")]
+          [:span tracker-label]]
      [:td [:span {:class "badge badge-light"} status]]
-     [:td (if-not (empty? label)
-            [:span {:class "badge badge-light"} label]
-            (prev-zone-label label prev-label event-time))]
+     (if-not (= label "я-вне-зон")
+       [:td {:class "zone-label"} [:span label]]
+       [:td [:span {:class "badge badge-secondary"}
+             (str "Выезд: " prev-label)]])
      [:td (if-not (empty? label)
             (timer-from cur-event-time))]
-     [:td (if-not (empty? label)
-            [:span {:class "badge badge-light"} (format-time cur-event-time)]
-            (prev-zone-time label prev-label event-time))]]))
+     (if-not (= label "я-вне-зон")
+       [:td [:span {:class "badge badge-light"} (format-time cur-event-time)]]
+       [:td [:span {:class "badge badge-secondary"} (format-time cur-event-time)]])]))
 
 
 (rum/defc trackers [trs]
@@ -130,4 +148,5 @@
 ;(d/transact! db/conn [{:tracker/id "t0" :tracker/status_movement "moved"}])
 
 ;(db/groups @db/conn)
+;(db/zones @db/conn)
 

@@ -31,3 +31,16 @@
     }
   }
 }
+
+td.tracker-label, td.zone-label{
+  span {
+    font-size: 85%;
+  }
+}
+
+td.tracker-label {
+  span.group-title {
+    font-size: 75%;
+    font-weight: bold;
+  }
+}

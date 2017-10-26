@@ -4,7 +4,7 @@
             [cljs.core.async :refer [<!]]
             [datascript.core :as d]
             [dashboard.config :refer [api-host]]
-            [dashboard.utils.core :refer [nil-to-str]]
+            [dashboard.utils.core :refer [nil-to-str nil-label]]
             [dashboard.db.core :as db]))
 
 
@@ -36,7 +36,7 @@
      :tracker/status_last_update_time status_last_update_time
      :tracker/status_movement status_movement
      :tracker/status_connection status_connection
-     :tracker/zone_label_current (nil-to-str zone_label_current)
+     :tracker/zone_label_current (nil-label zone_label_current)
      :tracker/zone_label_prev (nil-to-str zone_label_prev)
      :tracker/zone_parent_label (nil-to-str zone_parent_label)
      :tracker/last_parent_inzone_time (nil-to-str last_parent_inzone_time)
