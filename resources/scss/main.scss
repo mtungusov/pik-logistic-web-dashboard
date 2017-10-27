@@ -38,6 +38,23 @@
   }
 }
 
+div#left-menu {
+  div.form-check {
+    input[type=checkbox] {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+div#status {
+  color: #333;
+  font-size: 75%;
+
+  div#status-zones, div#status-groups {
+    padding: 0 0.3rem;
+  }
+}
+
 td.tracker-label, td.zone-label{
   span {
     font-size: 85%;

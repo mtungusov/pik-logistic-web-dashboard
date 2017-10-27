@@ -11,6 +11,9 @@
 (defonce checked-zones (atom #{}))
 (defonce checked-groups (atom #{}))
 
+;(defonce now-atom (atom (now-int)))
+;(js/setInterval #(reset! now-atom (now-int)) 15000)
+;(prn @now-atom)
 
 (defn reset-checked-items [checked-atom]
   (reset! checked-atom #{}))
@@ -123,9 +126,17 @@
         now-atom (::now-key state)
         now-sec (to-sec @now-atom)
         dur (- now-sec sec)]
-    (js/setTimeout #(reset! now-atom (now-int)) 10000)
+    (js/setTimeout #(reset! now-atom (now-int)) 15000)
     [:span {:class (set-time-class dur)} (format-sec dur)]))
 
+
+;(rum/defc timer-from < rum/reactive
+;  [time-str]
+;  (let [sec (to-sec-from-str time-str)
+;        now-sec (to-sec (rum/react now-atom))
+;        dur (- now-sec sec)]
+;    [:span {:class (set-time-class dur)} (format-sec dur)]))
+;
 
 (defn get-event-time [cur-time parent-time cur parent]
   (if (and (not-empty parent)
@@ -156,13 +167,13 @@
           [:span {:class "group-title"} (str group-title ": ")]
           [:span tracker-label]]
      [:td [:span {:class "badge badge-light"} status]]
-     (if-not (= label "я-вне-зон")
+     (if-not (= label "вне зон")
        [:td {:class "zone-label"} [:span label]]
        [:td [:span {:class "badge badge-secondary"}
              (str "Выезд: " prev-label)]])
      [:td (if-not (empty? label)
             (timer-from cur-event-time))]
-     (if-not (= label "я-вне-зон")
+     (if-not (= label "вне зон")
        [:td [:span {:class "badge badge-light"} (format-time cur-event-time)]]
        [:td [:span {:class "badge badge-secondary"} (format-time cur-event-time)]])]))
 
@@ -211,8 +222,8 @@
     (render (:db-after tx-report))))
 
 (api/load-trackers)
-
 (render @db/conn)
+
 ;(defn on-js-reload []
 ;  (swap! app-state update-in [:__figwheel_counter] inc))
 

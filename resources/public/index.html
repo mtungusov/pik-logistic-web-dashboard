@@ -12,53 +12,58 @@
 
 <div id="app" class="container-fluid">
   <div class="row">
-    <div id="accordion" role="tablist" class="col col-md-auto">
-      <div id="geo-zones">
-        <!--<div class="card">-->
-        <!--<div class="card-header" role="tab">-->
-          <!--<a href="#zones" data-toggle="collapse" aria-expanded="false" aria-controls="zones" class="collapsed"><span class="oi oi-globe"></span><span>Геозоны</span></a>-->
-        <!--</div>-->
-        <!--<div id="zones" class="collapse" role="tabpanel" data-parent="#accordion">-->
-          <!--<ul class="card-body">-->
-            <!--<li>480 КЖИ - погр.</li>-->
-          <!--</ul>-->
-        <!--</div>-->
-        <!--</div>-->
-      </div>
-      <div id="transport-groups">
-      <!--<div class="card">-->
-        <!--<div class="card-header" role="tab">-->
-          <!--<a href="#groups" data-toggle="collapse" aria-expanded="false" aria-controls="groups" class="collapsed"><span class="oi oi-grid-three-up"></span></span><span>Группы транспорта</span></a>-->
-        <!--</div>-->
-        <!--<div id="groups" class="collapse" role="tabpanel" data-parent="#accordion">-->
-          <!--<ul class="card-body">-->
-            <!--<li>Погрузчики и технологические</li>-->
-          <!--</ul>-->
+    <!--<div id="left-menu" class="col col-md-auto">-->
+      <!--<nav class="navbar">-->
+        <!--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#zones"><span class="oi oi-globe"></span></button>-->
+        <!--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#groups"><span class="oi oi-grid-three-up"></span></button>-->
+      <!--</nav>-->
+      <!--<div id="zones" class="collapse">-->
+        <!--<div class="form-check">-->
+          <!--<label class="form-check-label">-->
+            <!--<input type="checkbox" class="form-check-input">Zone 1</label>-->
         <!--</div>-->
       <!--</div>-->
+      <!--<div id="groups" class="collapse">-->
+        <!--<div class="form-check">-->
+          <!--<label class="form-check-label">-->
+            <!--<input type="checkbox" class="form-check-input">Gr 1</label>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+    <div id="accordion" role="tablist" class="col col-md-auto">
+      <div id="geo-zones">
+      </div>
+      <div id="transport-groups">
       </div>
     </div>
-    <div id="tablo" class="col">
-      <table class="table table-sm">
-        <thead class="thead-default">
-          <tr>
-            <th>Автомобиль</th>
-            <th>Статус</th>
-            <th>Геозона</th>
-            <th>Время в зоне</th>
-            <th>Въезд/Выезд</th>
-          </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>о230ес50 лангендорф Щелково</td>
-          <td>parked</td>
-          <td>480 КЖИ - погр.</td>
-          <td>08:19</td>
-          <td>2017-10-11 10:38:19</td>
-        </tr>
-        </tbody>
-      </table>
+    <div id="main" class="col">
+    <div id="status" class="d-none">
+      <div id="status-zones">Zone 1, Zone 2</div>
+      <div id="status-groups">Group 1, Group 2</div>
+    </div>
+    <div id="tablo" class="">
+      Загрузка...
+      <!--<table class="table table-sm">-->
+        <!--<thead class="thead-default">-->
+          <!--<tr>-->
+            <!--<th>Автомобиль</th>-->
+            <!--<th>Статус</th>-->
+            <!--<th>Геозона</th>-->
+            <!--<th>Время в зоне</th>-->
+            <!--<th>Въезд/Выезд</th>-->
+          <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+        <!--<tr>-->
+          <!--<td>о230ес50 лангендорф Щелково</td>-->
+          <!--<td>parked</td>-->
+          <!--<td>480 КЖИ - погр.</td>-->
+          <!--<td>08:19</td>-->
+          <!--<td>2017-10-11 10:38:19</td>-->
+        <!--</tr>-->
+        <!--</tbody>-->
+      <!--</table>-->
+    </div>
     </div>
   </div>
 </div>
