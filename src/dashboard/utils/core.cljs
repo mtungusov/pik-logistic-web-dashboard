@@ -10,7 +10,7 @@
   (if (nil? str) "" str))
 
 (defn nil-label [label]
-  (if (nil? label) "я-вне-зон" label))
+  (if (nil? label) "вне зон" label))
 
 (defn to-sec [time-int]
   (js/Math.trunc (/ time-int 1000)))

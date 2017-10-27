@@ -18,16 +18,32 @@
 
 (defonce conn (d/create-conn schema))
 
+(defonce default-trackers-query '([?e :tracker/id]
+                                  [?e :tracker/zone_label_current ?z]
+                                  [?e :tracker/group_title ?g]))
 
-(defn trackers [db zones-set]
-  (let [q '[:find [(pull ?e [*]) ...] :in $ $zones
-            :where [?e :tracker/id]
-                   [?e :tracker/zone_label_current ?lz]
-                   [(contains? $zones ?lz)]]
-        items (d/q q db zones-set)]
+(defn make-where [acc zone-set group-set]
+  (if (empty? zone-set)
+    (if (empty? group-set)
+      acc
+      (concat acc ['[(contains? ?groups ?g)]]))
+    (make-where (concat acc ['[(contains? ?zones ?z)]]) #{} group-set)))
+
+
+
+;(let [q {:find '[[(pull ?e [*]) ...]]
+;         :in '[$ ?zones ?groups]
+;         :where (make-where default-trackers-query z g)}]
+;  (d/q q @conn z g))
+
+(defn trackers [db zones-set groups-set]
+  (let [q {:find '[[(pull ?e [*]) ...]]
+           :in '[$ ?zones ?groups]
+           :where (make-where default-trackers-query zones-set groups-set)}
+        items (d/q q db zones-set groups-set)]
     (sort-by :tracker/order items)))
 
-;(first (trackers @conn))
+;(first (trackers @conn #{}))
 
 
 (defn groups [db]
@@ -65,8 +81,34 @@
 
 ;(d/q '[:find ?e :in $ :where [?e :zone/id]] @conn)
 ;(sort-by :zone/label (d/q '[:find [(pull ?e [*]) ...] :in $ :where [?e :zone/id]] @conn))
-;(d/q '[:find [(pull ?e [*]) ...] :in $
+;(def z #{})
+;(def z #{"480 КЖИ - погр."})
+;(def g #{"-Инлоудер" "Легковой автомобиль"})
+;(def g #{"Легковой автомобиль"})
+;(empty? z)
+;(d/q '[:find [(pull ?e [:tracker/id]) ...] :in $ ?z
 ;       :where [?e :tracker/id]
 ;              [?e :tracker/zone_label_current ?lz]
-;              [(contains? #{"Балашиха - разгр." "480 КЖИ - погр."} ?lz)]]
-;      @conn)
+;              [(or(contains? ?z ?lz)true)]]
+;      @conn z)
+
+
+
+;(make-where default-tracker-query #{} #{"g1"})
+
+
+;(let [q {:find '[[(pull ?e [:tracker/id]) ...]]
+;         :in '[$ ?zones ?groups]
+;         :where (concat ['[?e :tracker/id]]
+;                        ['[?e :tracker/zone_label_current ?lz]]
+;                        ['[(contains? ?z ?lz)]])}]
+;  (identity q)
+;  (d/q q @conn #{"480 КЖИ - погр."}))
+
+;(let [q {:find '[[(pull ?e [*]) ...]]
+;         :in '[$ ?zones ?groups]
+;         :where (make-where default-tracker-query z g)}]
+;  (d/q q @conn z g))
+
+              ;[(contains? ?z ?lz)]]
+;(contains? z "one")

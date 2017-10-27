@@ -173,15 +173,19 @@
      (tracker t))])
 
 
-(rum/defc tablo [trs]
-  [:table {:class "table table-sm"}
-   (tracker-header)
-   (trackers trs)])
+(rum/defc tablo < rum/reactive
+  [db]
+  (let [zones (rum/react checked-zones)
+        groups (rum/react checked-groups)
+        items (db/trackers db zones groups)]
+    [:table {:class "table table-sm"}
+     (tracker-header)
+     (trackers items)]))
 
 
-(defn render-tablo [items]
+(defn render-tablo [db]
   (when-let [element (-> js/document (.getElementById "tablo"))]
-    (rum/mount (tablo items) element)))
+    (rum/mount (tablo db) element)))
 
 
 (defn render-zones [items]
@@ -195,11 +199,11 @@
 
 (defn render [db]
   (let [zones (db/zones db)
-        groups (db/groups db)
-        trackers (db/trackers db @checked-zones)]
+        groups (db/groups db)]
+        ;trackers (db/trackers db @checked-zones)]
     (render-zones zones)
     (render-groups groups)
-    (render-tablo trackers)))
+    (render-tablo db)))
 
 
 (d/listen! db/conn :render
@@ -215,6 +219,6 @@
 
 ;(db/groups @db/conn)
 ;(db/zones @db/conn)
-;(db/trackers @db/conn @checked-zones)
+;(db/trackers @db/conn @checked-zones @checked-groups)
 ;(identity @db/conn)
 ;(identity @checked-zones)
