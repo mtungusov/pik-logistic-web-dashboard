@@ -30,6 +30,12 @@
       }
     }
   }
+
+  div.form-check {
+    input[type=checkbox] {
+      margin-right: 0.5rem;
+    }
+  }
 }
 
 td.tracker-label, td.zone-label{

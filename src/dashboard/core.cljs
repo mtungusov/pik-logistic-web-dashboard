@@ -7,16 +7,27 @@
 
 (enable-console-print!)
 
-(defonce app-state (atom {:text "Hello world!"}))
-
+;(defonce app-state (atom {:text "Hello world!"}))
 (defonce checked-zones (atom #{}))
+(defonce checked-groups (atom #{}))
+
+
+(defn reset-checked-items [checked-atom]
+  (reset! checked-atom #{}))
+
+(defn invert-checked-items [attr items checked-atom]
+  (let [all-items (set (map (keyword attr) items))
+        diffs (clojure.set/difference all-items @checked-atom)]
+    (reset! checked-atom diffs)))
+
 
 (rum/defc checkbox < rum/reactive
   [label value *ref]
   (let [vals (rum/react *ref)
         checked (contains? vals value)]
-    [:label
+    [:label {:class "form-check-label"}
      [:input {:type "checkbox"
+              :class "form-check-input"
               :checked checked
               :value value
               :on-click (fn [_]
@@ -31,15 +42,62 @@
   [:div {:class "card-body"}
    (for [z zones]
      [:div {:class "form-check" :key (:zone/id z)}
-      [:label {:class "form-check-label"}
-       [:input {:type "checkbox" :class "form-check-input" :value (:zone/label z)}]
-       (:zone/label z)]])])
+      (let [value (:zone/label z)]
+        (checkbox value value checked-zones))])])
+
+
+(rum/defc geo-zones-card [items]
+  [:div.card
+   [:div.card-header {:role "tab"}
+    [:a.collapsed {:href "#zones"
+                   :data-toggle "collapse"
+                   :aria-expanded "false"
+                   :aria-controls "zones"}
+     [:span.oi.oi-globe]
+     [:span "Геозоны"]]]
+   [:div#zones.collapse {:role "tabpanel" :data-parent "#accordion"}
+    [:div.btn-toolbar {:role "toolbar"}
+     [:div.btn-group {:role "group"}
+      [:button.btn.btn-sm.btn-outline-danger {:type "button"}
+       [:span.oi.oi-ban {:on-click (fn [_]
+                                     (reset-checked-items checked-zones)
+                                     (prn @checked-zones))}]]
+      [:button.btn.btn-sm.btn-outline-primary {:type "button"}
+       [:span.oi.oi-loop-circular {:on-click (fn [_]
+                                               (invert-checked-items "zone/label" items checked-zones)
+                                               (prn @checked-zones))}]]]]
+    (geo-zones items)]])
 
 
 (rum/defc transport-groups [groups]
-  [:ul {:class "card-body"}
+  [:div {:class "card-body"}
    (for [g groups]
-     [:li {:key (:group/id g)} (:group/title g)])])
+     [:div {:class "form-check" :key (:group/id g)}
+      (let [value (:group/title g)]
+        (checkbox value value checked-groups))])])
+
+
+(rum/defc transport-groups-card [items]
+  [:div.card
+   [:div.card-header {:role "tab"}
+    [:a.collapsed {:href "#groups"
+                   :data-toggle "collapse"
+                   :aria-expanded "false"
+                   :aria-controls "groups"}
+     [:span.oi.oi-grid-three-up]
+     [:span "Группы транспорта"]]]
+   [:div#groups.collapse {:role "tabpanel" :data-parent "#accordion"}
+    [:div.btn-toolbar {:role "toolbar"}
+     [:div.btn-group {:role "group"}
+      [:button.btn.btn-sm.btn-outline-danger {:type "button"}
+       [:span.oi.oi-ban {:on-click (fn [_]
+                                     (reset-checked-items checked-groups)
+                                     (prn @checked-groups))}]]
+      [:button.btn.btn-sm.btn-outline-primary {:type "button"}
+       [:span.oi.oi-loop-circular {:on-click (fn [_]
+                                               (invert-checked-items "group/title" items checked-groups)
+                                               (prn @checked-groups))}]]]]
+    (transport-groups items)]])
 
 
 (rum/defc tracker-header []
@@ -68,9 +126,6 @@
     (js/setTimeout #(reset! now-atom (now-int)) 10000)
     [:span {:class (set-time-class dur)} (format-sec dur)]))
 
-;(rum/defc prev-zone-time [cur prev time]
-;  (when (and (empty? cur) (not-empty prev))
-;    [:span {:class "badge badge-secondary"} (format-time time)]))
 
 (defn get-event-time [cur-time parent-time cur parent]
   (if (and (not-empty parent)
@@ -124,29 +179,42 @@
    (trackers trs)])
 
 
-(defn render [db]
-  (when-let [element (-> js/document (.getElementById "zones"))]
-    (rum/mount (geo-zones (db/zones db)) element))
-
-  (when-let [element (-> js/document (.getElementById "groups"))]
-    (rum/mount (transport-groups (db/groups db)) element))
-
+(defn render-tablo [items]
   (when-let [element (-> js/document (.getElementById "tablo"))]
-    (rum/mount (tablo (db/trackers db)) element)))
+    (rum/mount (tablo items) element)))
+
+
+(defn render-zones [items]
+  (when-let [element (-> js/document (.getElementById "geo-zones"))]
+    (rum/mount (geo-zones-card items) element)))
+
+(defn render-groups [items]
+  (when-let [element (-> js/document (.getElementById "transport-groups"))]
+    (rum/mount (transport-groups-card items) element)))
+
+
+(defn render [db]
+  (let [zones (db/zones db)
+        groups (db/groups db)
+        trackers (db/trackers db @checked-zones)]
+    (render-zones zones)
+    (render-groups groups)
+    (render-tablo trackers)))
+
 
 (d/listen! db/conn :render
   (fn [tx-report]
     (render (:db-after tx-report))))
 
 (api/load-trackers)
+
 (render @db/conn)
+;(defn on-js-reload []
+;  (swap! app-state update-in [:__figwheel_counter] inc))
 
-(defn on-js-reload [])
-  ;(swap! app-state update-in [:__figwheel_counter] inc))
-
-;(d/transact! db/conn [{:tracker/id "t2" :tracker/status_movement "stopped"}])
-;(d/transact! db/conn [{:tracker/id "t0" :tracker/status_movement "moved"}])
 
 ;(db/groups @db/conn)
 ;(db/zones @db/conn)
-
+;(db/trackers @db/conn @checked-zones)
+;(identity @db/conn)
+;(identity @checked-zones)

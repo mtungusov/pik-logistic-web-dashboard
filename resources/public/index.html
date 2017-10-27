@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="icon" href="https://clojurescript.org/images/cljs-logo-icon-32.png">
+  <!--<link rel="icon" href="https://clojurescript.org/images/cljs-logo-icon-32.png">-->
   <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="/css/open-iconic-bootstrap.min.css" rel="stylesheet">
   <link href="/css/style.css" rel="stylesheet" type="text/css">
@@ -13,25 +13,29 @@
 <div id="app" class="container-fluid">
   <div class="row">
     <div id="accordion" role="tablist" class="col col-md-auto">
-      <div class="card">
-        <div class="card-header" role="tab">
-          <a href="#zones" data-toggle="collapse" aria-expanded="false" aria-controls="zones" class="collapsed"><span class="oi oi-globe"></span><span>Геозоны</span></a>
-        </div>
-        <div id="zones" class="collapse" role="tabpanel" data-parent="#accordion">
-          <ul class="card-body">
-            <li>480 КЖИ - погр.</li>
-          </ul>
-        </div>
+      <div id="geo-zones">
+        <!--<div class="card">-->
+        <!--<div class="card-header" role="tab">-->
+          <!--<a href="#zones" data-toggle="collapse" aria-expanded="false" aria-controls="zones" class="collapsed"><span class="oi oi-globe"></span><span>Геозоны</span></a>-->
+        <!--</div>-->
+        <!--<div id="zones" class="collapse" role="tabpanel" data-parent="#accordion">-->
+          <!--<ul class="card-body">-->
+            <!--<li>480 КЖИ - погр.</li>-->
+          <!--</ul>-->
+        <!--</div>-->
+        <!--</div>-->
       </div>
-      <div class="card">
-        <div class="card-header" role="tab">
-          <a href="#groups" data-toggle="collapse" aria-expanded="false" aria-controls="groups" class="collapsed"><span class="oi oi-grid-three-up"></span></span><span>Группы транспорта</span></a>
-        </div>
-        <div id="groups" class="collapse" role="tabpanel" data-parent="#accordion">
-          <ul class="card-body">
-            <li>Погрузчики и технологические</li>
-          </ul>
-        </div>
+      <div id="transport-groups">
+      <!--<div class="card">-->
+        <!--<div class="card-header" role="tab">-->
+          <!--<a href="#groups" data-toggle="collapse" aria-expanded="false" aria-controls="groups" class="collapsed"><span class="oi oi-grid-three-up"></span></span><span>Группы транспорта</span></a>-->
+        <!--</div>-->
+        <!--<div id="groups" class="collapse" role="tabpanel" data-parent="#accordion">-->
+          <!--<ul class="card-body">-->
+            <!--<li>Погрузчики и технологические</li>-->
+          <!--</ul>-->
+        <!--</div>-->
+      <!--</div>-->
       </div>
     </div>
     <div id="tablo" class="col">

@@ -19,9 +19,12 @@
 (defonce conn (d/create-conn schema))
 
 
-(defn trackers [db]
-  (let [q '[:find [(pull ?e [*]) ...] :in $ :where [?e :tracker/id]]
-        items (d/q q db)]
+(defn trackers [db zones-set]
+  (let [q '[:find [(pull ?e [*]) ...] :in $ $zones
+            :where [?e :tracker/id]
+                   [?e :tracker/zone_label_current ?lz]
+                   [(contains? $zones ?lz)]]
+        items (d/q q db zones-set)]
     (sort-by :tracker/order items)))
 
 ;(first (trackers @conn))
