@@ -47,7 +47,8 @@
                ;; lein cljsbuild once min
                {:id "min"
                 :source-paths ["src"]
-                :compiler {:output-to "resources/public/js/compiled/main.js"
+                ;:clean-targets ^{:protect false} ["resources/public/js/compiled"]
+                :compiler {:output-to "resources/public/js/compiled/main.min.js"
                            :main dashboard.core
                            :optimizations :advanced
                            :pretty-print false}}]}

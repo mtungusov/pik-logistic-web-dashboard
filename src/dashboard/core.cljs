@@ -3,7 +3,7 @@
               [datascript.core :as d]
               [dashboard.db.core :as db]
               [dashboard.api.core :as api]
-              [dashboard.utils.core :refer [to-sec to-sec-from-str format-time format-sec now-int]]))
+              [dashboard.utils.core :refer [to-sec to-sec-from-str format-time format-sec now-int set-to-str]]))
 
 (enable-console-print!)
 
@@ -23,6 +23,27 @@
         diffs (clojure.set/difference all-items @checked-atom)]
     (reset! checked-atom diffs)))
 
+
+(rum/defc status-zones < rum/reactive
+  []
+  (let [zones (rum/react checked-zones)]
+    [:div#status-zones {:class (when (empty? zones) "d-none")}
+     [:span {:class "text-info"} "Геозоны: "]
+     (set-to-str zones)]))
+
+
+(rum/defc status-groups < rum/reactive
+  []
+  (let [groups (rum/react checked-groups)]
+    [:div#status-groups {:class (when (empty? groups) "d-none")}
+     [:span {:class "text-info"} "Группы: "]
+     (set-to-str groups)]))
+
+
+(rum/defc show-status []
+  [:div
+   (status-zones)
+   (status-groups)])
 
 (rum/defc checkbox < rum/reactive
   [label value *ref]
@@ -152,7 +173,8 @@
     "moving" "движ."
     status))
 
-(rum/defc tracker < {:key-fn (fn [tr] (str (:tracker/id tr)))} [tr]
+(rum/defc tracker < {:key-fn (fn [tr] (:tracker/id tr))}
+  [tr]
   (let [event-time (:tracker/event_time tr)
         parent-time (:tracker/last_parent_inzone_time tr)
         label (:tracker/zone_label_current tr)
@@ -160,28 +182,29 @@
         parent-label (:tracker/zone_parent_label tr)
         prev-label (:tracker/zone_label_prev tr)
         cur-event-time (get-event-time event-time parent-time label parent-label)
+        pr-cur-event-time (format-time cur-event-time)
         status (get-status (:tracker/status_movement tr))
-        group-title (:tracker/group_title tr)]
+        group-title (str (:tracker/group_title tr) ": ")]
     [:tr
      [:td {:class "tracker-label"}
-          [:span {:class "group-title"} (str group-title ": ")]
+          [:span {:class "group-title"} group-title]
           [:span tracker-label]]
      [:td [:span {:class "badge badge-light"} status]]
      (if-not (= label "вне зон")
        [:td {:class "zone-label"} [:span label]]
        [:td [:span {:class "badge badge-secondary"}
              (str "Выезд: " prev-label)]])
-     [:td (if-not (empty? label)
-            (timer-from cur-event-time))]
-     (if-not (= label "вне зон")
-       [:td [:span {:class "badge badge-light"} (format-time cur-event-time)]]
-       [:td [:span {:class "badge badge-secondary"} (format-time cur-event-time)]])]))
+     [:td (if-not (empty? label) (timer-from cur-event-time))]
+     [:td [:span
+           {:class (case label "вне зон" "badge badge-secondary" "badge badge-light")}
+           pr-cur-event-time]]]))
 
 
 (rum/defc trackers [trs]
   [:tbody
-   (for [t trs]
-     (tracker t))])
+   (mapv tracker trs)])
+   ;(for [t trs]
+   ;  (tracker t))])
 
 
 (rum/defc tablo < rum/reactive
@@ -203,17 +226,23 @@
   (when-let [element (-> js/document (.getElementById "geo-zones"))]
     (rum/mount (geo-zones-card items) element)))
 
+
 (defn render-groups [items]
   (when-let [element (-> js/document (.getElementById "transport-groups"))]
     (rum/mount (transport-groups-card items) element)))
 
 
+(defn render-status []
+  (when-let [element (-> js/document (.getElementById "status"))]
+     (rum/mount (show-status) element)))
+
+
 (defn render [db]
   (let [zones (db/zones db)
         groups (db/groups db)]
-        ;trackers (db/trackers db @checked-zones)]
     (render-zones zones)
     (render-groups groups)
+    (render-status)
     (render-tablo db)))
 
 

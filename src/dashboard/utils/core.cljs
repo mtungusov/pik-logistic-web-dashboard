@@ -16,6 +16,9 @@
   (js/Math.trunc (/ time-int 1000)))
 
 
+(defn set-to-str [s]
+  (clojure.string/join ", " s))
+
 (defn to-sec-from-str [time-str]
   (let [t (tf/parse-local time-str)]
     (to-sec t)))
