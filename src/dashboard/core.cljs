@@ -47,8 +47,7 @@
 
 (rum/defc checkbox < rum/reactive
   [label value *ref]
-  (let [vals (rum/react *ref)
-        checked (contains? vals value)]
+  (let [checked (contains? (rum/react *ref) value)]
     [:label {:class "form-check-label"}
      [:input {:type "checkbox"
               :class "form-check-input"
@@ -57,8 +56,8 @@
               :on-click (fn [_]
                           (if checked
                             (swap! *ref disj value)
-                            (swap! *ref conj value))
-                          (prn @*ref))}]
+                            (swap! *ref conj value)))}]
+                          ;(prn @*ref))}]
      label]))
 
 
@@ -84,12 +83,12 @@
      [:div.btn-group {:role "group"}
       [:button.btn.btn-sm.btn-outline-danger {:type "button"}
        [:span.oi.oi-ban {:on-click (fn [_]
-                                     (reset-checked-items checked-zones)
-                                     (prn @checked-zones))}]]
+                                     (reset-checked-items checked-zones))}]]
+                                     ;(prn @checked-zones))}]]
       [:button.btn.btn-sm.btn-outline-primary {:type "button"}
        [:span.oi.oi-loop-circular {:on-click (fn [_]
-                                               (invert-checked-items "zone/label" items checked-zones)
-                                               (prn @checked-zones))}]]]]
+                                               (invert-checked-items "zone/label" items checked-zones))}]]]]
+                                               ;(prn @checked-zones))}]]]]
     (geo-zones items)]])
 
 
@@ -115,12 +114,12 @@
      [:div.btn-group {:role "group"}
       [:button.btn.btn-sm.btn-outline-danger {:type "button"}
        [:span.oi.oi-ban {:on-click (fn [_]
-                                     (reset-checked-items checked-groups)
-                                     (prn @checked-groups))}]]
+                                     (reset-checked-items checked-groups))}]]
+                                     ;(prn @checked-groups))}]]
       [:button.btn.btn-sm.btn-outline-primary {:type "button"}
        [:span.oi.oi-loop-circular {:on-click (fn [_]
-                                               (invert-checked-items "group/title" items checked-groups)
-                                               (prn @checked-groups))}]]]]
+                                               (invert-checked-items "group/title" items checked-groups))}]]]]
+                                               ;(prn @checked-groups))}]]]]
     (transport-groups items)]])
 
 
@@ -173,48 +172,98 @@
     "moving" "движ."
     status))
 
+
+(rum/defc tracker-label < rum/static [tracker group]
+  [:td {:class "tracker-label"}
+   [:span {:class "badge badge-primary"}]
+   [:span {:class "group-title"} (str group ": ")]
+   [:span tracker]])
+
+(rum/defc tracker-status < rum/static [status]
+  [:td [:span {:class "badge badge-light"} status]])
+
+(rum/defc tracker-zone < rum/static [zone zone-prev]
+  (case zone
+    "вне зон" [:td [:span {:class "badge badge-secondary"} (str "Выезд: " zone-prev)]]
+    [:td {:class "zone-label"} [:span zone]]))
+
+(rum/defc tracker-time-in-zone < rum/static [event-time]
+  [:td (timer-from event-time)])
+
+(rum/defc tracker-event-time < rum/static [zone event-time]
+  [:td [:span
+        {:class (case zone "вне зон" "badge badge-secondary" "badge badge-light")}
+        (format-time event-time)]])
+
+;(defn tracker-visible? [zone group checked-zones checked-groups]
+;  (case [(empty? checked-zones) (empty? checked-groups) (contains? checked-zones zone) (contains? checked-groups group)]
+;    [true true false false] true
+;    [false true false false] false
+;    [false true true false] true
+;    [true false false false] false
+;    [true false false true] true
+;    [false false false false] false
+;    [false false true false] false
+;    [false false false true] false
+;    [false false true true] true
+;    false))
+
+
 (rum/defc tracker < {:key-fn (fn [tr] (:tracker/id tr))}
+                    rum/static
   [tr]
   (let [event-time (:tracker/event_time tr)
         parent-time (:tracker/last_parent_inzone_time tr)
-        label (:tracker/zone_label_current tr)
-        tracker-label (:tracker/label tr)
-        parent-label (:tracker/zone_parent_label tr)
-        prev-label (:tracker/zone_label_prev tr)
-        cur-event-time (get-event-time event-time parent-time label parent-label)
+        tracker (:tracker/label tr)
+        zone-label (:tracker/zone_label_current tr)
+        zone-label-parent (:tracker/zone_parent_label tr)
+        zone-label-prev (:tracker/zone_label_prev tr)
+        cur-event-time (get-event-time event-time parent-time zone-label zone-label-parent)
         pr-cur-event-time (format-time cur-event-time)
         status (get-status (:tracker/status_movement tr))
-        group-title (str (:tracker/group_title tr) ": ")]
-    [:tr
-     [:td {:class "tracker-label"}
-          [:span {:class "group-title"} group-title]
-          [:span tracker-label]]
-     [:td [:span {:class "badge badge-light"} status]]
-     (if-not (= label "вне зон")
-       [:td {:class "zone-label"} [:span label]]
-       [:td [:span {:class "badge badge-secondary"}
-             (str "Выезд: " prev-label)]])
-     [:td (if-not (empty? label) (timer-from cur-event-time))]
-     [:td [:span
-           {:class (case label "вне зон" "badge badge-secondary" "badge badge-light")}
-           pr-cur-event-time]]]))
+        group-title (:tracker/group_title tr)]
+        ;vis? (tracker-visible? zone-label group-title (rum/react checked-zones) (rum/react checked-groups))]
+    ;(if vis?
+      [:tr
+       ;(tracker-label tracker group-title)
+       [:td {:class "tracker-label"}
+            [:span {:class "group-title"} group-title]
+            [:span tracker]]
+       ;(tracker-status status)
+       [:td [:span {:class "badge badge-light"} status]]
+       ;(tracker-zone zone-label zone-label)
+       (if-not (= zone-label "вне зон")
+         [:td {:class "zone-label"} [:span zone-label]]
+         [:td [:span {:class "badge badge-secondary"}
+               (str "Выезд: " zone-label)]])
+       ;(tracker-time-in-zone cur-event-time)
+       [:td (if-not (empty? zone-label) (timer-from cur-event-time))]
+       ;(tracker-event-time zone-label event-time)]))
+       [:td [:span
+             {:class (case zone-label "вне зон" "badge badge-secondary" "badge badge-light")}
+             pr-cur-event-time]]]))
+      ;[:tr {:class "d-none"}])))
 
 
-(rum/defc trackers [trs]
-  [:tbody
-   (mapv tracker trs)])
+(rum/defc trackers < rum/reactive
+  [db]
+  (let [trs (db/trackers db (rum/react checked-zones) (rum/react checked-groups))]
+    [:tbody
+     (mapv tracker trs)]))
    ;(for [t trs]
    ;  (tracker t))])
 
 
-(rum/defc tablo < rum/reactive
+(rum/defc tablo
   [db]
-  (let [zones (rum/react checked-zones)
-        groups (rum/react checked-groups)
-        items (db/trackers db zones groups)]
-    [:table {:class "table table-sm"}
-     (tracker-header)
-     (trackers items)]))
+  [:table {:class "table table-sm"}
+   (tracker-header)
+   (trackers db)])
+  ;(let [zones (rum/react checked-zones)
+  ;      groups (rum/react checked-groups)
+  ;      items (db/trackers db #{} #{})]
+  ;  [:table {:class "table table-sm"}
+  ;   (tracker-header)]))
 
 
 (defn render-tablo [db]
@@ -240,6 +289,8 @@
 (defn render [db]
   (let [zones (db/zones db)
         groups (db/groups db)]
+        ;items (db/trackers db zones groups)]
+        ;items (db/trackers db #{} #{})]
     (render-zones zones)
     (render-groups groups)
     (render-status)
