@@ -11,6 +11,11 @@ FIXME: Write a paragraph about the library/project and highlight its goals.
 
 rlwrap lein cooper
 
+## Prod
+
+lein clean
+lein cljsbuild once min
+
 ## Setup
 
 To get an interactive development environment run:
