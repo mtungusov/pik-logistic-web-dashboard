@@ -41,7 +41,7 @@
            :in '[$ ?zones ?groups]
            :where (make-where default-trackers-query zones-set groups-set)}
         items (d/q q db zones-set groups-set)]
-    (sort-by :tracker/order items)))
+    (sort-by :tracker/order-comp items)))
 
 ;(first (trackers @conn #{}))
 
@@ -56,8 +56,9 @@
 
 (defn zones [db]
   (let [q '[:find [(pull ?e [*]) ...] :in $ :where [?e :zone/id]]
-        items (d/q q db)]
-    (sort-by :zone/label items)))
+        items (d/q q db)
+        out-zone {:zone/id "z-0", :zone/label "вне зон"}]
+    (conj (sort-by :zone/label items) out-zone)))
 
 ;(zones @conn)
 

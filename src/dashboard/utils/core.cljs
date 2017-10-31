@@ -12,8 +12,8 @@
 (defn nil-label [label]
   (if (nil? label) "вне зон" label))
 
-(defn to-sec [time-int]
-  (js/Math.trunc (/ time-int 1000)))
+(defn to-sec [time-in-msec]
+  (js/Math.trunc (/ time-in-msec 1000)))
 
 
 (defn set-to-str [s]
@@ -25,8 +25,9 @@
 
 
 (defn format-time [time-str]
-  (let [t (tf/parse-local time-str)]
-    (tf/unparse (tf/formatter "yyyy-MM-dd HH:mm") t)))
+  (subs time-str 0 16))
+  ;(let [t (tf/parse-local time-str)]
+  ;  (tf/unparse (tf/formatter "yyyy-MM-dd HH:mm") t)))
 
 ;(format-time "2017-10-24 10:47:56")
 ;(require '[goog.string :as gstring])
@@ -66,4 +67,8 @@
 ;(t/to-utc-time-zone (tc/from-string "2017-10-19 15:21:00"))
 
 (defn now-int []
-  (tc/to-long (t/now)))
+  ;(tc/to-long (t/now))
+  (to-sec (js/Date.now)))
+  ;(js/Math.trunc (/ (js/Date.now) 1000)))
+
+;(now-int)

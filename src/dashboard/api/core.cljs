@@ -4,7 +4,7 @@
             [cljs.core.async :refer [<!]]
             [datascript.core :as d]
             [dashboard.config :refer [api-host]]
-            [dashboard.utils.core :refer [nil-to-str nil-label]]
+            [dashboard.utils.core :refer [nil-to-str nil-label to-sec now-int]]
             [dashboard.db.core :as db]))
 
 
@@ -16,31 +16,64 @@
 ;  (if (nil? str) "" str))
 
 
-(defn convert-tracker-for-db [tracker order-atom]
+(defn get-event-time [event-time event-time-parent zone-label zone-label-parent]
+  (if (and (not-empty zone-label-parent)
+           (not-empty event-time-parent)
+           (= zone-label-parent zone-label))
+    event-time-parent
+    event-time))
+
+(defn get-status [status]
+  (case status
+    "parked" "стоит"
+    "stopped" "стоит"
+    "moving" "движ."
+    status))
+
+(defn zone-label-for-order [label]
+  (case label
+    "вне зон" "ЯЯ"
+    label))
+
+(defn convert-tracker-for-db [tracker]
   (let [id (str "t-"(:id tracker))
-        label (:label tracker)
+        t-label (:label tracker)
         event_time (:event_time tracker)
+        last_parent_inzone_time (nil-to-str (:last_parent_inzone_time tracker))
+        zone_label_current (nil-label (:zone_label_current tracker))
+        zone_label_parent (nil-to-str (:zone_parent_label tracker))
+        zone_label_prev (nil-to-str (:zone_label_prev tracker))
         status_last_update_time (:status_last_update tracker)
-        status_movement (:status_movement tracker)
+        status_movement (get-status (:status_movement tracker))
         status_connection (:status_connection tracker)
-        zone_label_current (:zone_label_current tracker)
-        zone_label_prev (:zone_label_prev tracker)
-        zone_parent_label (:zone_parent_label tracker)
-        last_parent_inzone_time (:last_parent_inzone_time tracker)
-        group_title (:group_title tracker)]
-    (swap! order-atom inc)
-    {:tracker/id (str id)
-     :tracker/order @order-atom
-     :tracker/label label
-     :tracker/event_time event_time
-     :tracker/status_last_update_time status_last_update_time
+        group_title (:group_title tracker)
+        event_time_cur (get-event-time event_time last_parent_inzone_time zone_label_current zone_label_parent)
+        event_time_cur_in_sec (to-sec (js/Date.parse event_time_cur))
+        t-now (now-int)]
+    ;(swap! order-atom inc)
+    {:tracker/id id
+     ;:tracker/order @order-atom
+     :tracker/label t-label
+     :tracker/event_time event_time_cur
+     :tracker/event_time_in_sec event_time_cur_in_sec
+     ;:tracker/status_last_update_time status_last_update_time
      :tracker/status_movement status_movement
      :tracker/status_connection status_connection
-     :tracker/zone_label_current (nil-label zone_label_current)
-     :tracker/zone_label_prev (nil-to-str zone_label_prev)
-     :tracker/zone_parent_label (nil-to-str zone_parent_label)
-     :tracker/last_parent_inzone_time (nil-to-str last_parent_inzone_time)
-     :tracker/group_title group_title}))
+     :tracker/zone_label_current zone_label_current
+     :tracker/zone_label_prev zone_label_prev
+     ;:tracker/zone_parent_label zone_label_parent
+     ;:tracker/last_parent_inzone_time last_parent_inzone_time
+     :tracker/group_title group_title
+     :tracker/order-comp (str (zone-label-for-order zone_label_current) ":" event_time_cur_in_sec)}))
+
+;cur-event-time (get-event-time event-time parent-time zone-label zone-label-parent)
+;(defn get-event-time [cur-time parent-time cur parent]
+;  (if (and (not-empty parent)
+;           (not-empty parent-time)
+;           (= parent cur))
+;    parent-time
+;    cur-time))
+
 
 
 (defn convert-zone-for-db [zone]
@@ -61,23 +94,24 @@
 
 ;(convert-group-for-db {:group_id 0 :group_title "zero"})
 
-(defn datom-from-one-api-element [el order-atom]
-  (remove nil? [(convert-tracker-for-db el order-atom)
+(defn datom-from-one-api-element [el]
+  (remove nil? [(convert-tracker-for-db el)
                 (convert-group-for-db el)
                 (convert-zone-for-db el)]))
 
 ;(datom-from-one-api-element {:zone_parent_label nil, :group_id 112479, :event "inzone", :zone_label_prev nil, :label "е774ор777 легковой ПИ", :id 209286, :status_connection "active", :zone_label_current "480 КЖИ - погр.", :zone_id 96909, :zone_parent_id nil, :event_time "2017-10-24 13:01:26", :last_parent_inzone_time nil, :status_movement "parked", :group_title "Легковой автомобиль", :zone_label "480 КЖИ - погр."} (atom 1))
 
 (defn load-trackers []
+  ;(prn "load from DB")
   (go (let [url (str api-host "/q/trackers")
             resp (<! (http/get url))
             status (:status resp)]
         (if (= status 200)
-          (let [trackers (get-in resp [:body :result])
-                trackers-order (atom 0)]
+          (let [trackers (get-in resp [:body :result])]
+                ;trackers-order (atom 0)]
                 ;datoms (reduce #(into %1 (datom-from-one-api-element %2 trackers-order)) [] trackers)]
             ;(doseq [d datoms] (prn d)))
-            (d/transact! db/conn (reduce #(into %1 (datom-from-one-api-element %2 trackers-order)) [] trackers)))
+            (d/transact! db/conn (reduce #(into %1 (datom-from-one-api-element %2)) [] trackers)))
             ;(prn (reduce #(into %1 (prn %2 trackers-order)) [] trackers)))
             ;(d/transact! db/conn datoms))
             ;(d/transact! db/conn (reduce #(conj %1 (convert-tracker-for-db %2 trackers-order)) [] trackers)))
