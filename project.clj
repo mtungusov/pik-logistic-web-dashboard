@@ -11,6 +11,7 @@
                  [org.clojure/core.async  "0.3.443"]
                  [rum "0.10.8"]
                  [com.andrewmcveigh/cljs-time "0.5.0"]
+                 [cljsjs/moment "2.17.1-1"]
                  [datascript "0.16.2"]
                  [cljs-http "0.1.43"]]
 

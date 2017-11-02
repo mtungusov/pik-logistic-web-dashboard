@@ -204,6 +204,9 @@
     (js/setInterval #(swap! now-atom now-int) 9000)
     [:span {:class (set-time-class dur)} (format-sec dur)]))
 
+;(- (now-int) 1509611315)
+
+;(format-sec 2124)
 
 ;(defn get-event-time [cur-time parent-time cur parent]
 ;  (if (and (not-empty parent)
@@ -314,6 +317,8 @@
         ;t-order  (:tracker/order-comp i)
         g-title  (:tracker/group_title i)
         t-status (:tracker/status_movement i)
+        t-status-connection (:tracker/status_connection i)
+        t-status-gps-updated (:tracker/status_gps_update i)
         z-label  (:tracker/zone_label_current i)
         z-label-prev (:tracker/zone_label_prev i)
         e-time   (:tracker/event_time i)
@@ -323,7 +328,11 @@
       ;[:span {:class "badge badge-warning"} t-order]
       [:span {:class "group-title"} (str g-title ": ")]
       [:span t-label]]
-     [:td [:span {:class "badge badge-light"} t-status]]
+     [:td {:class "tracker-status"}
+      [:div
+       [:span {:class "badge badge-light"} t-status]
+       [:span {:class (case t-status-connection "вкл." "badge badge-success" "badge badge-dark")} t-status-connection]]
+      [:span {:class "time-ago"} t-status-gps-updated]]
      (zone-label z-label z-label-prev)
      [:td (timer-from e-time-utc-in-sec)]
      [:td [:span

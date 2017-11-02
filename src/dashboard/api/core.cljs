@@ -3,6 +3,8 @@
   (:require [cljs-http.client :as http]
             [cljs.core.async :refer [<!]]
             [datascript.core :as d]
+            [cljsjs.moment]
+            [cljsjs.moment.locale.ru]
             [dashboard.config :refer [api-host]]
             [dashboard.utils.core :refer [nil-to-str nil-label to-sec now-int]]
             [dashboard.db.core :as db]))
@@ -23,12 +25,28 @@
     event-time-parent
     event-time))
 
-(defn get-status [status]
+(defn get-status-movement [status]
   (case status
     "parked" "стоит"
     "stopped" "стоит"
     "moving" "движ."
     status))
+
+(defn get-status-connection [status]
+  (case status
+    "active" "вкл."
+    "выкл."))
+
+(.locale js/moment "ru")
+
+(defn time-ago [time]
+  (.fromNow (js/moment time)))
+
+;(js/moment.locale "ru")
+;(js/moment "2017-11-02 11:20")
+;(.fromNow (js/moment "2017-11-02 13:32"))
+;(js/moment 1509610829000)
+
 
 (defn zone-label-for-order [label]
   (case label
@@ -44,35 +62,24 @@
         zone_label_parent (nil-to-str (:zone_parent_label tracker))
         zone_label_prev (nil-to-str (:zone_label_prev tracker))
         status_last_update_time (:status_last_update tracker)
-        status_movement (get-status (:status_movement tracker))
-        status_connection (:status_connection tracker)
+        status_movement (get-status-movement (:status_movement tracker))
+        status_connection (get-status-connection (:status_connection tracker))
+        status_gps_update (time-ago (:status_gps_update tracker))
         group_title (:group_title tracker)
         event_time_cur (get-event-time event_time last_parent_inzone_time zone_label_current zone_label_parent)
         event_time_cur_in_sec (to-sec (js/Date.parse event_time_cur))
         t-now (now-int)]
-    ;(swap! order-atom inc)
     {:tracker/id id
-     ;:tracker/order @order-atom
      :tracker/label t-label
      :tracker/event_time event_time_cur
      :tracker/event_time_in_sec event_time_cur_in_sec
-     ;:tracker/status_last_update_time status_last_update_time
      :tracker/status_movement status_movement
      :tracker/status_connection status_connection
+     :tracker/status_gps_update status_gps_update
      :tracker/zone_label_current zone_label_current
      :tracker/zone_label_prev zone_label_prev
-     ;:tracker/zone_parent_label zone_label_parent
-     ;:tracker/last_parent_inzone_time last_parent_inzone_time
      :tracker/group_title group_title
      :tracker/order-comp (str (zone-label-for-order zone_label_current) ":" event_time_cur_in_sec)}))
-
-;cur-event-time (get-event-time event-time parent-time zone-label zone-label-parent)
-;(defn get-event-time [cur-time parent-time cur parent]
-;  (if (and (not-empty parent)
-;           (not-empty parent-time)
-;           (= parent cur))
-;    parent-time
-;    cur-time))
 
 
 

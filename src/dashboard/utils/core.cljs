@@ -9,8 +9,10 @@
 (defn nil-to-str [str]
   (if (nil? str) "" str))
 
+
 (defn nil-label [label]
   (if (nil? label) "вне зон" label))
+
 
 (defn to-sec [time-in-msec]
   (js/Math.trunc (/ time-in-msec 1000)))
@@ -18,6 +20,7 @@
 
 (defn set-to-str [s]
   (clojure.string/join ", " s))
+
 
 (defn to-sec-from-str [time-str]
   (let [t (tf/parse-local time-str)]
@@ -46,10 +49,16 @@
         hh (/ (rem sec one-day) one-hour)
         mm (/ (rem (rem sec one-day) one-hour) one-min)
         ss (rem (rem (rem sec one-day) one-hour) one-min)
-        in-day (string/join ":" (map #(gstring/padNumber % 2 0) [hh mm]))]
+        conv-f (comp #(gstring/padNumber % 2 0) js/Math.trunc)
+        in-day (string/join ":" (map #(conv-f %) [hh mm]))]
     (if (>= dd 1)
       (str (gstring/padNumber dd 2 0) "д. " in-day)
       in-day)))
+
+;(/ (rem 2124 one-day) one-hour)
+;((comp #(gstring/padNumber % 2 0) js/Math.trunc) 0.59)
+;(gstring/padNumber 0.59 2 0)
+;(format-sec 2124)
 
 ;(string/join ":" (map #(gstring/padNumber % 2 0) [12.345 34.5677]))
 ;(format-sec 12386400)
