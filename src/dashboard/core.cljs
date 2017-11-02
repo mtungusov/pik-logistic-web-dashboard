@@ -31,19 +31,22 @@
     (clojure.set/intersection val fresh)))
 
 
-(defn validate-checked [val ref-name]
-  (case ref-name
-    "dashboard/selected-zones" (validate-checked-zones val)
-    "dashboard/selected-groups" (validate-checked-groups val)))
+(defn get-validated-checked [val ref-name]
+  (if (set? val)
+    (case ref-name
+      "dashboard/selected-zones" (validate-checked-zones val)
+      "dashboard/selected-groups" (validate-checked-groups val))
+    #{}))
 
-;(validate-checked #{"480 КЖИ - погр."} "dashboard/selected-zones")
-;(validate-checked #{"-Тюльпан"} "dashboard/selected-groups")
+;(get-validated-checked #{"480 КЖИ - погр."} "dashboard/selected-zones")
+;(get-validated-checked #{"-Тюльпан"} "dashboard/selected-groups")
 
 (defn load-checked [*ref ref-name]
-  (let [load-str (JSON.parse (js/localStorage.getItem ref-name))
-        val (cljs.reader/read-string load-str)
-        to-load (validate-checked val ref-name)]
-    (reset! *ref to-load)))
+  (when-let [checked (js/localStorage.getItem ref-name)]
+    (let [load-str (JSON.parse checked)
+          val (cljs.reader/read-string load-str)
+          to-load (get-validated-checked val ref-name)]
+      (reset! *ref to-load))))
 
 
 ;(load-checked checked-zones zones-ref-name)
@@ -151,11 +154,11 @@
       [:button.btn.btn-sm.btn-outline-danger {:type "button"}
        [:span.oi.oi-ban {:on-click (fn [_]
                                      (reset-checked-items checked-groups)
-                                     (save-checked checked-zones groups-ref-name))}]]
+                                     (save-checked checked-groups groups-ref-name))}]]
       [:button.btn.btn-sm.btn-outline-primary {:type "button"}
        [:span.oi.oi-loop-circular {:on-click (fn [_]
                                                (invert-checked-items "group/title" items checked-groups)
-                                               (save-checked checked-zones groups-ref-name))}]]]]
+                                               (save-checked checked-groups groups-ref-name))}]]]]
     (transport-groups items)]])
 
 
