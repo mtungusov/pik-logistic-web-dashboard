@@ -10,8 +10,6 @@
             [dashboard.db.core :as db]))
 
 
-;(def api-host "http://localhost:3000/api/v2")
-;
 ;{:group_id 112474, :event "outzone", :zone_label_prev "ДСК-Град - погр.", :label "н552ке750 борт 20т ДСК-Град", :id 191404, :status_connection "active", :zone_label_current nil, :zone_id 94608, :zone_parent_id nil, :event_time "2017-10-23 08:18:19", :last_parent_inzone_time nil, :status_movement "parked", :group_title "Борт 12т.-20т.", :zone_label "ДСК-Град - погр."}
 
 ;(defn nil-to-str [str]
@@ -113,6 +111,7 @@
   (go (let [url (str api-host "/q/trackers")
             resp (<! (http/get url))
             status (:status resp)]
+        ; (js/console.log url)
         (if (= status 200)
           (let [trackers (get-in resp [:body :result])]
                 ;trackers-order (atom 0)]
@@ -139,4 +138,3 @@
 ;      (prn resp)))
 
 ;(load-trackers)
-
