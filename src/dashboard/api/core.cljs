@@ -6,7 +6,7 @@
             [cljsjs.moment]
             [cljsjs.moment.locale.ru]
             [dashboard.config :refer [api-host]]
-            [dashboard.utils.core :refer [nil-to-str nil-label to-sec now-int]]
+            [dashboard.utils.core :refer [nil-to-str nil-label]]
             [dashboard.db.core :as db]))
 
 
@@ -37,13 +37,25 @@
 
 (.locale js/moment "ru")
 
+(defn to-sec [time-in-msec]
+  (js/Math.floor (/ time-in-msec 1000)))
+
 (defn time-ago [time]
   (.fromNow (js/moment time)))
 
 ;(js/moment.locale "ru")
-;(js/moment "2017-11-02 11:20")
+;(js/moment "2017-11-10 15:00")
 ;(.fromNow (js/moment "2017-11-02 13:32"))
 ;(js/moment 1509610829000)
+;(.valueOf js/moment)
+;(js/Date.now)
+;(def t1 (js/moment))
+;(.valueOf (js/moment))
+;(def t0 (js/moment "2017-11-10 12:30"))
+;(.toNow t0 true)
+
+;(.diff (js/moment) (js/moment "2017-11-10 15:27") "seconds")
+;
 
 
 (defn zone-label-for-order [label]
@@ -51,9 +63,21 @@
     "вне зон" "ЯЯ"
     label))
 
+;(def t "о496хт199 борт 20т 1АК")
+;(re-find #"^(\S*)\s+(.*)$" t)
+
+(defn parse-label [label]
+  (let [r (re-find #"^(\S*)\s+(.*)$" label)]
+    {:plate (nth r 1)
+     :desc  (nth r 2)}))
+
+;(parse-label "о496хт199 борт 20т 1АК")
+
 (defn convert-tracker-for-db [tracker]
   (let [id (str "t-"(:id tracker))
-        t-label (:label tracker)
+        t-label (parse-label (:label tracker))
+        t-plate (:plate t-label)
+        t-desc (:desc t-label)
         event_time (:event_time tracker)
         last_parent_inzone_time (nil-to-str (:last_parent_inzone_time tracker))
         zone_label_current (nil-label (:zone_label_current tracker))
@@ -65,19 +89,23 @@
         status_gps_update (time-ago (:status_gps_update tracker))
         group_title (:group_title tracker)
         event_time_cur (get-event-time event_time last_parent_inzone_time zone_label_current zone_label_parent)
-        event_time_cur_in_sec (to-sec (js/Date.parse event_time_cur))
-        t-now (now-int)]
+        event_time_moment (js/moment event_time_cur)
+        event_time_cur_in_msec (.valueOf event_time_moment)
+        duration (.diff (js/moment) event_time_moment "seconds")]
     {:tracker/id id
-     :tracker/label t-label
+     :tracker/plate t-plate
+     :tracker/desc t-desc
      :tracker/event_time event_time_cur
-     :tracker/event_time_in_sec event_time_cur_in_sec
+     :tracker/duration duration
+     ;:tracker/event_time_in_sec event_time_cur_in_sec
      :tracker/status_movement status_movement
      :tracker/status_connection status_connection
      :tracker/status_gps_update status_gps_update
      :tracker/zone_label_current zone_label_current
      :tracker/zone_label_prev zone_label_prev
      :tracker/group_title group_title
-     :tracker/order-comp (str (zone-label-for-order zone_label_current) ":" event_time_cur_in_sec)}))
+     :tracker/order-comp (str (zone-label-for-order zone_label_current) ":" event_time_cur_in_msec)}))
+
 
 
 
@@ -123,7 +151,7 @@
             ;(d/transact! db/conn (reduce #(conj %1 (convert-tracker-for-db %2 trackers-order)) [] trackers)))
             ;(doseq [t trackers] (prn t)))
             ;(doseq [t trackers] (prn (convert-tracker-for-db t trackers-order))))
-          (js/alert "Ошибка связи с API")))))
+          (js/console.log "Ошибка связи с API")))))
         ;(prn (map :event trackers)))))
 
 ;(db/trackers @db/conn)

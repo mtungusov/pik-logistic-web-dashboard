@@ -28,7 +28,8 @@
                 ;; The presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:on-jsload "dashboard.core/on-js-reload"}
+                :figwheel {:websocket-host "192.168.225.211"
+                           :on-jsload "dashboard.core/on-js-reload"}
                            ;; :open-urls will pop open your application
                            ;; in the default browser once Figwheel has
                            ;; started and compiled your application.
@@ -56,7 +57,7 @@
 
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default
-             ;; :server-ip "127.0.0.1"
+             ;:server-ip "192.168.225.211"
 
              :css-dirs ["resources/public/css"] ;; watch and update CSS
 

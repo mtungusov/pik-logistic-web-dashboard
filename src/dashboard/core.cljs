@@ -3,7 +3,7 @@
               [datascript.core :as d]
               [dashboard.db.core :as db]
               [dashboard.api.core :as api]
-              [dashboard.utils.core :refer [to-sec to-sec-from-str format-time format-sec now-int set-to-str]]))
+              [dashboard.utils.core :refer [format-time format-sec set-to-str]]))
 
 (enable-console-print!)
 
@@ -168,7 +168,7 @@
     [:th "Автомобиль"]
     [:th "Статус"]
     [:th "Геозона"]
-    [:th "Время в зоне"]
+    [:th "Время в зоне/вне зон"]
     [:th "Въезд/Выезд"]]])
 
 
@@ -197,12 +197,16 @@
 ;    [:span {:class (set-time-class dur)} (format-sec dur)]))
 ;
 
-(rum/defcs timer-from < (rum/local (now-int) ::now-key)
-  [state time-in-sec]
-  (let [now-atom (::now-key state)
-        dur (- @now-atom time-in-sec)]
-    (js/setInterval #(swap! now-atom now-int) 9000)
-    [:span {:class (set-time-class dur)} (format-sec dur)]))
+;(rum/defcs timer-from < (rum/local (now-int) ::now-key)
+;  [state time-in-sec]
+;  (let [now-atom (::now-key state)
+;        dur (- @now-atom time-in-sec)]
+;    (js/setInterval #(swap! now-atom now-int) 9000)
+;    [:span {:class (set-time-class dur)} (format-sec dur)]))
+
+(rum/defc timer-from < rum/static [duration-in-sec]
+   [:span {:class (set-time-class duration-in-sec)} (format-sec duration-in-sec)])
+    ;[:span {:class (set-time-class dur)} (format-sec dur)]
 
 ;(- (now-int) 1509611315)
 
@@ -313,28 +317,29 @@
 (rum/defc tr-simple < rum/static
                       {:key-fn (fn [tr] (:tracker/id tr))}
   [i]
-  (let [t-label  (:tracker/label i)
+  (let [t-plate (:tracker/plate i)
+        t-desc (:tracker/desc i)
         ;t-order  (:tracker/order-comp i)
-        g-title  (:tracker/group_title i)
+        ;g-title  (:tracker/group_title i)
         t-status (:tracker/status_movement i)
         t-status-connection (:tracker/status_connection i)
         t-status-gps-updated (:tracker/status_gps_update i)
         z-label  (:tracker/zone_label_current i)
         z-label-prev (:tracker/zone_label_prev i)
         e-time   (:tracker/event_time i)
-        e-time-utc-in-sec (:tracker/event_time_in_sec i)]
+        ;e-time-utc-in-sec (:tracker/event_time_in_sec i)
+        duration (:tracker/duration i)]
     [:tr
      [:td {:class "tracker-label"}
-      ;[:span {:class "badge badge-warning"} t-order]
-      [:span {:class "group-title"} (str g-title ": ")]
-      [:span t-label]]
+      [:span {:class "badge badge-light"} t-plate]
+      [:span t-desc]]
      [:td {:class "tracker-status"}
       [:div
        [:span {:class "badge badge-light"} t-status]
        [:span {:class (case t-status-connection "вкл." "badge badge-success" "badge badge-dark")} t-status-connection]]
       [:span {:class "time-ago"} t-status-gps-updated]]
      (zone-label z-label z-label-prev)
-     [:td (timer-from e-time-utc-in-sec)]
+     [:td (timer-from duration)]
      [:td [:span
            {:class (case z-label "вне зон" "badge badge-secondary" "badge badge-light")}
            (format-time e-time)]]]))

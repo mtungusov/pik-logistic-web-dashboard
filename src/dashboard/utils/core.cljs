@@ -14,17 +14,17 @@
   (if (nil? label) "вне зон" label))
 
 
-(defn to-sec [time-in-msec]
-  (js/Math.trunc (/ time-in-msec 1000)))
-
+;(defn to-sec [time-in-msec]
+;  (js/Math.floor (/ time-in-msec 1000)))
+;
 
 (defn set-to-str [s]
   (clojure.string/join ", " s))
 
 
-(defn to-sec-from-str [time-str]
-  (let [t (tf/parse-local time-str)]
-    (to-sec t)))
+;(defn to-sec-from-str [time-str]
+;  (let [t (tf/parse-local time-str)]
+;    (to-sec t)))
 
 
 (defn format-time [time-str]
@@ -75,9 +75,7 @@
 ;(tc/from-long (tc/to-long "2017-10-19 15:21:00"))
 ;(t/to-utc-time-zone (tc/from-string "2017-10-19 15:21:00"))
 
-(defn now-int []
-  ;(tc/to-long (t/now))
-  (to-sec (js/Date.now)))
-  ;(js/Math.trunc (/ (js/Date.now) 1000)))
+;(defn now-int []
+;  (to-sec (js/Date.now)))
 
 ;(now-int)
