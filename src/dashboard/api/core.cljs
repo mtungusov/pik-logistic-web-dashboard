@@ -97,7 +97,6 @@
      :tracker/desc t-desc
      :tracker/event_time event_time_cur
      :tracker/duration duration
-     ;:tracker/event_time_in_sec event_time_cur_in_sec
      :tracker/status_movement status_movement
      :tracker/status_connection status_connection
      :tracker/status_gps_update status_gps_update
