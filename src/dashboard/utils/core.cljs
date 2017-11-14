@@ -27,8 +27,8 @@
 ;    (to-sec t)))
 
 
-(defn format-time [time-str]
-  (subs time-str 0 16))
+;(defn format-time [time-str]
+;  (subs time-str 0 16))
   ;(let [t (tf/parse-local time-str)]
   ;  (tf/unparse (tf/formatter "yyyy-MM-dd HH:mm") t)))
 

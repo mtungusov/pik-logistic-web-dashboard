@@ -3,7 +3,7 @@
               [datascript.core :as d]
               [dashboard.db.core :as db]
               [dashboard.api.core :as api]
-              [dashboard.utils.core :refer [format-time format-sec set-to-str]]))
+              [dashboard.utils.core :refer [format-sec set-to-str]]))
 
 (enable-console-print!)
 
@@ -326,7 +326,7 @@
         t-status-gps-updated (:tracker/status_gps_update i)
         z-label  (:tracker/zone_label_current i)
         z-label-prev (:tracker/zone_label_prev i)
-        e-time   (:tracker/event_time i)
+        e-time   (:tracker/event_time_formatted i)
         ;e-time-utc-in-sec (:tracker/event_time_in_sec i)
         duration (:tracker/duration i)]
     [:tr
@@ -342,7 +342,7 @@
      [:td (timer-from duration)]
      [:td [:span
            {:class (case z-label "вне зон" "badge badge-secondary" "badge badge-light")}
-           (format-time e-time)]]]))
+           e-time]]]))
 
 
 (rum/defc trackers < rum/static

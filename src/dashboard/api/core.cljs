@@ -43,8 +43,12 @@
 (defn time-ago [time]
   (.fromNow (js/moment time)))
 
+(defn format-time [moment-time]
+  (.format moment-time "DD.MM.YY HH:mm"))
+
 ;(js/moment.locale "ru")
 ;(js/moment "2017-11-10 15:00")
+;(.format (js/moment "2017-11-10 15:00") "DD.MM.YY HH:mm")
 ;(.fromNow (js/moment "2017-11-02 13:32"))
 ;(js/moment 1509610829000)
 ;(.valueOf js/moment)
@@ -90,12 +94,13 @@
         group_title (:group_title tracker)
         event_time_cur (get-event-time event_time last_parent_inzone_time zone_label_current zone_label_parent)
         event_time_moment (js/moment event_time_cur)
+        event_time-formatted (format-time event_time_moment)
         event_time_cur_in_msec (.valueOf event_time_moment)
         duration (.diff (js/moment) event_time_moment "seconds")]
     {:tracker/id id
      :tracker/plate t-plate
      :tracker/desc t-desc
-     :tracker/event_time event_time_cur
+     :tracker/event_time_formatted event_time-formatted
      :tracker/duration duration
      :tracker/status_movement status_movement
      :tracker/status_connection status_connection

@@ -28,9 +28,10 @@
                 ;; The presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:websocket-host "192.168.225.211"
-                           :on-jsload "dashboard.core/on-js-reload"}
-                           ;; :open-urls will pop open your application
+                :figwheel {:on-jsload "dashboard.core/on-js-reload"}
+                           ;:websocket-host "192.168.225.211"}
+
+                ;; :open-urls will pop open your application
                            ;; in the default browser once Figwheel has
                            ;; started and compiled your application.
                            ;; Comment this out once it no longer serves you.
