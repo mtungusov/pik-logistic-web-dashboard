@@ -7,7 +7,8 @@
 (defn chkbox [label value db-key subs-key]
   (let [checked (rf/subscribe [subs-key value])]
     [:label {:key label
-             :class "form-check-label"}
+             :class "form-check-label"
+             :style {:display :block}}
      [:input {:type "checkbox"
               :class "form-check-input"
               :value value
@@ -20,20 +21,20 @@
      label]))
 
 
-(defn selector-groups []
-  (let [items (rf/subscribe [::subs/groups])]
-    [:div {:style {:float :left}} "Groups:"
-     (doall
-       (for [i @items]
-         (chkbox i i :groups-selected ::subs/group-selected?)))]))
-
-
 (defn selector-geo-zones []
   (let [items (rf/subscribe [::subs/geo-zones])]
-    [:div {:style {:float :left}} "Geo zones:"
+    [:div.form-check
      (doall
        (for [i @items]
          (chkbox i i :geo-zones-selected ::subs/geo-zone-selected?)))]))
+
+
+(defn selector-groups []
+  (let [items (rf/subscribe [::subs/groups])]
+    [:div
+     (doall
+       (for [i @items]
+         (chkbox i i :groups-selected ::subs/group-selected?)))]))
 
 
 (defn show-tracker [t]
@@ -58,9 +59,14 @@
 
 
 (defn main-panel []
-  [:div
-   (selector-groups)
-   (selector-geo-zones)
-   [:div {:style {:clear :both}}]
-   (list-trackers)])
+  [:div.row
+   [:div.col-md-3
+    [:div "Геозоны"
+     [:div "Buttons"]
+     (selector-geo-zones)]
+    [:div "Группы транспорта"
+     [:div "Buttons"]
+     (selector-groups)]]
+   [:div.col
+    (list-trackers)]])
 
