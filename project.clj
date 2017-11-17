@@ -26,7 +26,7 @@
                    [figwheel-sidecar "0.5.14"]
                    [com.cemerick/piggieback "0.2.2"]
                    [re-frisk "0.5.2"]]
-    :source-paths ["src/cljs"]
+    :source-paths ["src/cljs" "dev"]
     :plugins      [[lein-figwheel "0.5.14"]]
     :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}}
 
