@@ -11,6 +11,13 @@ lein clean
 rlwrap lein figwheel dev
 ```
 
+#### -OR-
+
+```
+lein cooper
+```
+
+
 ### In Cursive REPL
 ```
 (use 'figwheel-sidecar.repl-api)

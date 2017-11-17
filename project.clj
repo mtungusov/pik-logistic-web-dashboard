@@ -35,7 +35,7 @@
    [{:id           "dev"
      :source-paths ["src/cljs"]
      :figwheel     {:on-jsload "pik-logistic-dashboard.core/mount-root"
-                    :websocket-host "192.168.225.230"}
+                    :websocket-host "192.168.225.241"}
      :compiler     {:main                 pik-logistic-dashboard.core
                     :output-to            "resources/public/js/compiled/app.js"
                     :output-dir           "resources/public/js/compiled/out"

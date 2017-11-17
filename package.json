@@ -1,0 +1,15 @@
+{
+  "name": "pik-logistic-dashboard",
+  "version": "1.0.0",
+  "description": "For PIK Industry",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scss": "node-sass --watch resources/scss/main.scss resources/public/css/style.css"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "node-sass": "^4.6.1"
+  }
+}
