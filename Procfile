@@ -1,2 +1,2 @@
-figwheel: rlwrap lein figwheel
+figwheel: rlwrap lein figwheel dev
 sass: npm run scss
