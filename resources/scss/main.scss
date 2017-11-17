@@ -16,3 +16,27 @@
     padding: 0.5rem 1rem;
   }
 }
+
+#list-trackers {
+  margin-right: 1rem;
+}
+
+#list-trackers-header {
+  color: #555;
+  background-color: #eee;
+  font-weight: bold;
+  padding: 0.5rem 0;
+}
+
+#status-bar {
+  color: #333;
+  font-size: 75%;
+
+  span {
+    padding-right: 0.2rem;
+  }
+}
+
+.zone-label {
+  font-size: 85%;
+}

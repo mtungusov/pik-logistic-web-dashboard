@@ -43,21 +43,30 @@
 
 
 (defn show-tracker [t]
-  [:div {:key (str (:id t))}
-   [:div (:label t)]
-   [:div
+  [:div.row {:key (str (:id t))}
+   [:div.col-4 (:label t)]
+   [:div.col-2
     [:div (:status_last_update t)]
     [:div (:status_connection t)]
     [:div (:status_movement t)]
     [:div (:status_gps_update t)]]
-   [:div (:zone_label_current t)]
-   [:div (:event_time t)]
-   [:div (:event_time t)]])
+   [:div.col-2.zone-label (:zone_label_current t)]
+   [:div.col-2 (:event_time t)]
+   [:div.col-2 (:event_time t)]])
 
+
+(defn list-trackers-header []
+  [:div#list-trackers-header.row
+   [:div.col-4.align-self-center "Автомобиль"]
+   [:div.col-2.align-self-center "Статус"]
+   [:div.col-2.align-self-center "Геозона"]
+   [:div.col-2.align-self-center "Время в зоне/вне зон"]
+   [:div.col-2.align-self-center "Въезд/Выезд"]])
 
 (defn list-trackers []
   (let [items (rf/subscribe [::subs/trackers-filtered-by-geo-zones-and-groups])]
-    [:div
+    [:div#list-trackers
+     (list-trackers-header)
      (for [i @items]
        (show-tracker i))]))
 
