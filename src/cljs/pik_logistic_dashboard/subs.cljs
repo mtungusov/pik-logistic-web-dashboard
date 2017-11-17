@@ -26,7 +26,7 @@
 (rf/reg-sub
   ::geo-zones
   (fn [db _]
-    (sort (:geo-zones db))))
+    (conj (sort (:geo-zones db)) "вне зон")))
 
 (rf/reg-sub
   ::geo-zones-selected

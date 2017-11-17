@@ -1,1 +1,18 @@
-//local styles
+.tool-header {
+  span {
+    display: inline-block;
+    margin: 1rem;
+  }
+}
+
+.chkbox-block {
+  margin-bottom: 0.2rem;
+
+  .btn-toolbar {
+    margin-left: 1rem;
+  }
+
+  .form-check {
+    padding: 0.5rem 1rem;
+  }
+}
