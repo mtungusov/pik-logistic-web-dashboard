@@ -3,7 +3,8 @@
             [clojure.string :as string]
             [day8.re-frame.http-fx]
             [ajax.core :refer [json-request-format json-response-format]]
-            [pik-logistic-dashboard.db :as db]))
+            [pik-logistic-dashboard.db :as db]
+            [pik-logistic-dashboard.subs :as subs]))
 
 (def base-url "https://dashboard-cars.pik-industry.ru")
 (def api-version "api/v3")
@@ -85,11 +86,11 @@
 (rf/reg-event-db
   ::invert-geo-zones-selections
   (fn [db _]
-    (let [all-items (conj (:geo-zones db) "вне зон")]
+    (let [all-items (set @(rf/subscribe [::subs/geo-zones]))]
       (update db :geo-zones-selected #(clojure.set/difference all-items %)))))
 
 (rf/reg-event-db
   ::invert-groups-selections
   (fn [db _]
-    (let [all-items (:groups db)]
+    (let [all-items (set @(rf/subscribe [::subs/groups]))]
       (update db :groups-selected #(clojure.set/difference all-items %)))))
