@@ -40,12 +40,12 @@
   (fn [items [_ value]]
     (contains? items value)))
 
+
 (rf/reg-sub
   ::trackers
   (fn [db _]
-    (let [trs (:trackers db)
-          res (map first (vals (group-by :id trs)))]
-      res)))
+    (let [trs (:trackers db)]
+      (sort-by :tracker_label trs))))
 
 
 (defn filter-fn [key-v v filter-vals]
@@ -62,7 +62,7 @@
     [(rf/subscribe [::trackers])
      (rf/subscribe [::geo-zones-selected])])
   (fn [[items filter-set]]
-    (apply-filter :zone_label_current items filter-set)))
+    (apply-filter :zone_label_cur items filter-set)))
 
 
 (rf/reg-sub

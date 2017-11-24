@@ -43,16 +43,15 @@
 
 
 (defn show-tracker [t]
-  [:div.row {:key (str (:id t))}
-   [:div.col-4 (:label t)]
+  [:div.row {:key (str (:tracker_id t))}
+   [:div.col-4 (:tracker_label t)]
    [:div.col-2
-    [:div (:status_last_update t)]
-    [:div (:status_connection t)]
-    [:div (:status_movement t)]
-    [:div (:status_gps_update t)]]
-   [:div.col-2.zone-label (:zone_label_current t)]
-   [:div.col-2 (:event_time t)]
-   [:div.col-2 (:event_time t)]])
+    [:div (:movement_status t)]
+    [:div (:connection_status t)]
+    [:div (:gps_updated t)]]
+   [:div.col-2.zone-label (:zone_label_in t)]
+   [:div.col-2 (:time_in t)]
+   [:div.col-2 (:time_in t)]])
 
 
 (defn list-trackers-header []

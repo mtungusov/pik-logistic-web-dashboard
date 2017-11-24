@@ -7,7 +7,7 @@
             [pik-logistic-dashboard.subs :as subs]))
 
 (def base-url "https://dashboard-cars.pik-industry.ru")
-(def api-version "api/v3")
+(def api-version "api/v4")
 
 
 (defn uri [& path]
@@ -23,6 +23,13 @@
 
 
 (rf/reg-event-fx
+  ::load-data
+  (fn [_ _]
+    (rf/dispatch [::load-trackers])
+    (rf/dispatch [::load-groups])
+    (rf/dispatch [::load-geo-zones])))
+
+(rf/reg-event-fx
   ::load-trackers
   (fn [_ _]
     {:http-xhrio {:method :get
@@ -33,30 +40,61 @@
                   :on-success [::trackers-loaded]
                   :on-failure [::error-api]}}))
 
-;(rf/dispatch [::load-trackers])
 
-(defn- extract-data [trackers extract-key]
-  (set (map extract-key trackers)))
+(rf/reg-event-fx
+  ::load-groups
+  (fn [_ _]
+    {:http-xhrio {:method :get
+                  :uri (uri "q/groups")
+                  :timeout 10000
+                  :format (json-request-format)
+                  :response-format (json-response-format {:keywords? true})
+                  :on-success [::groups-loaded]
+                  :on-failure [::error-api]}}))
+
+
+(rf/reg-event-fx
+  ::load-geo-zones
+  (fn [_ _]
+    {:http-xhrio {:method :get
+                  :uri (uri "q/zones")
+                  :timeout 10000
+                  :format (json-request-format)
+                  :response-format (json-response-format {:keywords? true})
+                  :on-success [::zones-loaded]
+                  :on-failure [::error-api]}}))
+
+
+(defn convert-tracker [tracker]
+  (let [zone_label_in (:zone_label_in tracker)]
+    (cond-> tracker
+      zone_label_in (assoc :zone_label_cur zone_label_in)
+      (nil? zone_label_in) (assoc :zone_label_cur "вне зон")
+      true (assoc :order-comp "label + time in msec"))))
+
 
 (rf/reg-event-db
   ::trackers-loaded
   (fn [db [_ resp]]
     (let [items (get-in resp [:result])]
       ;(js/console.log "loaded: " (str (extract-groups items)))
-      (rf/dispatch [::load-groups items])
-      (rf/dispatch [::load-geo-zones items])
-      (assoc db :trackers items))))
+      ;(rf/dispatch [::load-groups items])
+      ;(rf/dispatch [::load-geo-zones items])
+      (assoc db :trackers (map convert-tracker items)))))
 
 
 (rf/reg-event-db
-  ::load-groups
-  (fn [db [_ items]]
-    (assoc db :groups (extract-data items :group_title))))
+  ::groups-loaded
+  (fn [db [_ resp]]
+    (let [items (get-in resp [:result])]
+      (assoc db :groups (set items)))))
 
 (rf/reg-event-db
-  ::load-geo-zones
-  (fn [db [_ items]]
-    (assoc db :geo-zones (extract-data items :zone_label))))
+  ::zones-loaded
+  (fn [db [_ resp]]
+    (let [items (get-in resp [:result])]
+      (assoc db :geo-zones (set items)))))
+
 
 (rf/reg-event-db
   ::error-api

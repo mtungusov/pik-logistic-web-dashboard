@@ -20,6 +20,6 @@
 
 (defn ^:export init []
   (rf/dispatch-sync [::events/initialize-db])
-  (rf/dispatch-sync [::events/load-trackers])
+  (rf/dispatch-sync [::events/load-data])
   (dev-setup)
   (mount-root))
