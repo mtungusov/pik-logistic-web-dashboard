@@ -45,7 +45,7 @@
   ::trackers
   (fn [db _]
     (let [trs (:trackers db)]
-      (sort-by :tracker_label trs))))
+      (sort-by :order-comp trs))))
 
 
 (defn filter-fn [key-v v filter-vals]

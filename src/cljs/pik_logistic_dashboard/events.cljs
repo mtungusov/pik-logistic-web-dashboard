@@ -3,18 +3,22 @@
             [clojure.string :as string]
             [day8.re-frame.http-fx]
             [ajax.core :refer [json-request-format json-response-format]]
+            [cljsjs.moment]
+            [cljsjs.moment.locale.ru]
+            [goog.string :as gstring]
             [pik-logistic-dashboard.db :as db]
             [pik-logistic-dashboard.subs :as subs]))
 
 (def base-url "https://dashboard-cars.pik-industry.ru")
 (def api-version "api/v4")
+(def dashboard-time-format "DD.MM.YY HH:mm")
 
 
 (defn uri [& path]
   (string/join "/" (concat [base-url api-version] path)))
 
 ;(uri "q/trackers")
-
+;(js/moment 1511772780000)
 
 (rf/reg-event-db
  ::initialize-db
@@ -65,12 +69,107 @@
                   :on-failure [::error-api]}}))
 
 
-(defn convert-tracker [tracker]
+(rf/reg-event-fx
+  ::selected-zones->local-storage
+  (fn [_ _]
+    (let [zones (rf/subscribe [::subs/geo-zones-selected])])))
+
+
+(.locale js/moment "ru")
+
+(defn- format-time [time-utc]
+  (when time-utc
+    (let [t (js/moment time-utc)]
+      (.format t dashboard-time-format))))
+
+;(format-time nil)
+;(js/moment nil)
+
+
+(defn- gen-zone-label [tracker]
+  (if-let [zone_label_in (:zone_label_in tracker)]
+    zone_label_in
+    (:zone_label_out tracker)))
+
+(defn- gen-time-inout [tracker]
+  (if-let [zone_label_in (:zone_label_in tracker)]
+    (:time_in tracker)
+    (:time_out tracker)))
+
+
+(def one-min 60)
+(def one-hour (* 60 one-min))
+(def one-day (* 24 one-hour))
+
+(defn format-sec [sec]
+  (when sec
+    (let [dd (/ sec one-day)
+          hh (/ (rem sec one-day) one-hour)
+          mm (/ (rem (rem sec one-day) one-hour) one-min)
+          ss (rem (rem (rem sec one-day) one-hour) one-min)
+          conv-f (comp #(gstring/padNumber % 2 0) js/Math.trunc)
+          in-day (string/join ":" (map #(conv-f %) [hh mm]))]
+      (if (>= dd 1)
+        (str (gstring/padNumber dd 2 0) "д. " in-day)
+        in-day))))
+
+
+(defn- gen-duration [time-utc]
+  (when time-utc
+    (let [now (js/moment)
+          t (js/moment time-utc)]
+      (.diff now t "seconds"))))
+
+
+(defn time-ago [time-utc]
+  (.fromNow (js/moment time-utc)))
+
+
+(defn parse-tracker-label [label]
+  (let [r (re-find #"^(\S*)\s+(.*)$" label)]
+    {:plate (nth r 1)
+     :desc  (nth r 2)}))
+
+
+(defn gen-status-movement [status]
+  (case status
+    "parked" "стоит"
+    "stopped" "стоит"
+    "moving" "движ."
+    status))
+
+(defn gen-status-connection [status]
+  (case status
+    "active" "вкл."
+    "выкл."))
+
+
+(defn- gen-order [tracker]
   (let [zone_label_in (:zone_label_in tracker)]
+    (if (nil? zone_label_in)
+      (str "яя:" (:time_out tracker))
+      (str zone_label_in ":" (:time_in tracker)))))
+
+
+(defn- convert-tracker [tracker]
+  (let [zone_label_in (:zone_label_in tracker)
+        zone_label_inout (gen-zone-label tracker)
+        time_inout (gen-time-inout tracker)
+        time_inout_duration (gen-duration time_inout)
+        gps_updated (:gps_updated tracker)
+        tracker-label-parsed (parse-tracker-label (:tracker_label tracker))]
     (cond-> tracker
       zone_label_in (assoc :zone_label_cur zone_label_in)
       (nil? zone_label_in) (assoc :zone_label_cur "вне зон")
-      true (assoc :order-comp "label + time in msec"))))
+      true (assoc :zone_label_inout zone_label_inout)
+      true (assoc :time_inout time_inout)
+      true (assoc :time_inout_fmt (format-time time_inout))
+      true (assoc :time_inout_duration time_inout_duration :time_inout_duration_fmt (format-sec time_inout_duration))
+      true (assoc :gps_updated_fmt (format-time gps_updated) :gps_updated_ago (time-ago gps_updated))
+      true (assoc :tracker_plate (:plate tracker-label-parsed) :tracker_desc (:desc tracker-label-parsed))
+      true (assoc :movement_status_fmt (gen-status-movement (:movement_status tracker)))
+      true (assoc :connection_status_fmt (gen-status-connection (:connection_status tracker)))
+      true (assoc :order-comp (gen-order tracker)))))
 
 
 (rf/reg-event-db

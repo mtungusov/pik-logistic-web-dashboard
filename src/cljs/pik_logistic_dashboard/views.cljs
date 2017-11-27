@@ -42,16 +42,26 @@
          (chkbox i i :groups-selected ::subs/group-selected?)))]))
 
 
+(defn set-time-class [dur]
+  (cond
+    (>= dur (* 120 60)) "badge-danger"
+    (>= dur (* 60 60)) "badge-warning"
+    :else "badge-light"))
+
+
 (defn show-tracker [t]
-  [:div.row {:key (str (:tracker_id t))}
-   [:div.col-4 (:tracker_label t)]
+  [:div.row.tracker-info {:key (str (:tracker_id t))}
+   [:div.col-4.tracker-label
+    [:span {:class "badge badge-light"} (:tracker_plate t)]
+    [:span (:tracker_desc t)]]
    [:div.col-2
-    [:div (:movement_status t)]
-    [:div (:connection_status t)]
-    [:div (:gps_updated t)]]
-   [:div.col-2.zone-label (:zone_label_in t)]
-   [:div.col-2 (:time_in t)]
-   [:div.col-2 (:time_in t)]])
+    [:div
+     [:span.badge {:class "badge-light"} (:movement_status_fmt t)]
+     [:span.badge {:class (case (:connection_status_fmt t) "вкл." "badge-success" "badge-dark")} (:connection_status_fmt t)]]
+    [:span.time-ago {:title (:gps_updated_fmt t) :data-toggle "tooltip" :data-placement "left"} (:gps_updated_ago t)]]
+   [:div.col-2.zone-label [:span (:zone_label_inout t)]]
+   [:div.col-2 [:span.badge {:class (set-time-class (:time_inout_duration t))} (:time_inout_duration_fmt t)]]
+   [:div.col-2 [:span.badge {:class (if (:zone_label_in t) "badge-light" "badge-secondary")} (:time_inout_fmt t)]]])
 
 
 (defn list-trackers-header []
