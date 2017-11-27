@@ -33,6 +33,7 @@
     (rf/dispatch [::load-groups])
     (rf/dispatch [::load-geo-zones])))
 
+
 (rf/reg-event-fx
   ::load-trackers
   (fn [_ _]
@@ -72,7 +73,54 @@
 (rf/reg-event-fx
   ::selected-zones->local-storage
   (fn [_ _]
-    (let [zones (rf/subscribe [::subs/geo-zones-selected])])))
+    (let [items (rf/subscribe [::subs/geo-zones-selected])]
+      (js/localStorage.setItem "selected-zones" (prn-str @items)))))
+
+;(rf/dispatch [::selected-zones->local-storage])
+
+(rf/reg-event-fx
+  ::selected-groups->local-storage
+  (fn [_ _]
+    (let [items (rf/subscribe [::subs/groups-selected])]
+      (js/localStorage.setItem "selected-groups" (prn-str @items)))))
+
+
+;(rf/dispatch [::selected-groups->local-storage])
+
+
+(defn- validate-loaded-selected-zones [items]
+  (let [zones (rf/subscribe [::subs/geo-zones])]
+    (if-not (set? items)
+      #{}
+      (clojure.set/intersection items (set @zones)))))
+
+;(validate-loaded-selected-zones #{"one" "480 КЖИ - погр."})
+
+
+(defn- validate-loaded-selected-groups [items]
+  (let [groups (rf/subscribe [::subs/groups])]
+    (if-not (set? items)
+      #{}
+      (clojure.set/intersection items (set @groups)))))
+
+
+(rf/reg-event-db
+  ::local-storage->selected-zones
+  (fn [db _]
+    (let [items-str (js/localStorage.getItem "selected-zones")
+          items (cljs.reader/read-string items-str)]
+      (assoc db :geo-zones-selected (validate-loaded-selected-zones items)))))
+
+;(rf/dispatch [::local-storage->selected-zones])
+
+(rf/reg-event-db
+  ::local-storage->selected-groups
+  (fn [db _]
+    (let [items-str (js/localStorage.getItem "selected-groups")
+          items (cljs.reader/read-string items-str)]
+      (assoc db :groups-selected (validate-loaded-selected-groups items)))))
+
+;(rf/dispatch [::local-storage->selected-groups])
 
 
 (.locale js/moment "ru")
