@@ -6,6 +6,7 @@
             [cljsjs.moment]
             [cljsjs.moment.locale.ru]
             [goog.string :as gstring]
+            [cljs.reader :refer [read-string]]
             [pik-logistic-dashboard.db :as db]
             [pik-logistic-dashboard.subs :as subs]))
 
@@ -116,7 +117,7 @@
   ::local-storage->selected-zones
   (fn [db _]
     (let [items-str (js/localStorage.getItem "selected-zones")
-          items (cljs.reader/read-string items-str)]
+          items (read-string items-str)]
       (assoc db :geo-zones-selected (validate-loaded-selected-zones items)))))
 
 ;(rf/dispatch [::local-storage->selected-zones])
@@ -125,7 +126,7 @@
   ::local-storage->selected-groups
   (fn [db _]
     (let [items-str (js/localStorage.getItem "selected-groups")
-          items (cljs.reader/read-string items-str)]
+          items (read-string items-str)]
       (assoc db :groups-selected (validate-loaded-selected-groups items)))))
 
 ;(rf/dispatch [::local-storage->selected-groups])
