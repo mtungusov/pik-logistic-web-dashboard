@@ -138,7 +138,7 @@
                                                                                  {:ev ::events/invert-groups-selections})
     [:div.chkbox-block
      [:div.tool-header.bg-light {:class "text-primary"}
-      [:a {:href "http://dashboard-cars.pik-industry.ru/charts/"
+      [:a {:href "https://dashboard-cars.pik-industry.ru/charts/"
            :target "_blank"}
        [:span.oi.oi-bar-chart]]]]]
    [:div.col
