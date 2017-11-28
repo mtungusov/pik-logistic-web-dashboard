@@ -51,7 +51,7 @@
 
 (defn show-tracker [t]
   [:div.row.tracker-info {:key (str (:tracker_id t))}
-   [:div.col-4.tracker-label
+   [:div.col-3.tracker-label
     [:span {:class "badge badge-light"} (:tracker_plate t)]
     [:span (:tracker_desc t)]]
    [:div.col-2
@@ -59,16 +59,17 @@
      [:span.badge {:class "badge-light"} (:movement_status_fmt t)]
      [:span.badge {:class (case (:connection_status_fmt t) "вкл." "badge-success" "badge-dark")} (:connection_status_fmt t)]]
     [:span.time-ago {:title (:gps_updated_fmt t) :data-toggle "tooltip" :data-placement "left"} (:gps_updated_ago t)]]
-   [:div.col-2.zone-label [:span (:zone_label_inout t)]]
+   [:div.col-3.zone-label [:span.badge {:class (when-not (:zone_label_in t) "badge-secondary")}
+                           (when-not (:zone_label_in t) "Выезд: ") (:zone_label_inout t)]]
    [:div.col-2 [:span.badge {:class (set-time-class (:time_inout_duration t))} (:time_inout_duration_fmt t)]]
    [:div.col-2 [:span.badge {:class (if (:zone_label_in t) "badge-light" "badge-secondary")} (:time_inout_fmt t)]]])
 
 
 (defn list-trackers-header []
   [:div#list-trackers-header.row
-   [:div.col-4.align-self-center "Автомобиль"]
+   [:div.col-3.align-self-center "Автомобиль"]
    [:div.col-2.align-self-center "Статус"]
-   [:div.col-2.align-self-center "Геозона"]
+   [:div.col-3.align-self-center "Геозона"]
    [:div.col-2.align-self-center "Время в зоне/вне зон"]
    [:div.col-2.align-self-center "Въезд/Выезд"]])
 

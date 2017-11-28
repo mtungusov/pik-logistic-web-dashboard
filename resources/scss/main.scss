@@ -42,9 +42,16 @@
   border-bottom: 1px solid #eee;
 }
 
-.tracker-label, .zone-label{
+.tracker-label {
   span {
     font-size: 85%;
+  }
+}
+
+.zone-label {
+  span {
+    font-size: 85%;
+    font-weight: normal;
   }
 }
 
