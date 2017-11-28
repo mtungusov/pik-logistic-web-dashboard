@@ -1,6 +1,7 @@
 (ns pik-logistic-dashboard.views
   (:require [re-frame.core :as rf]
             [reagent.core :as r]
+            [clojure.string]
             [pik-logistic-dashboard.subs :as subs]
             [pik-logistic-dashboard.events :as events]))
 

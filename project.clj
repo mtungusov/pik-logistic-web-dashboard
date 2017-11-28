@@ -38,7 +38,7 @@
      :figwheel     {:on-jsload "pik-logistic-dashboard.core/mount-root"}
                     ;:websocket-host "192.168.225.241"}
      :compiler     {:main                 pik-logistic-dashboard.core
-                    :output-to            "resources/public/js/compiled/app-v0.2.2.js"
+                    :output-to            "resources/public/js/compiled/app-v0.2.3.js"
                     :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
                     :source-map-timestamp true
@@ -49,7 +49,7 @@
     {:id           "min"
      :source-paths ["src/cljs"]
      :compiler     {:main            pik-logistic-dashboard.core
-                    :output-to       "resources/public/js/compiled/app-v0.2.2.js"
+                    :output-to       "resources/public/js/compiled/app-v0.2.3.js"
                     :optimizations   :advanced
                     :closure-defines {goog.DEBUG false}
                     :pretty-print    false}}]})
