@@ -84,8 +84,16 @@
     (let [items (rf/subscribe [::subs/groups-selected])]
       (js/localStorage.setItem "selected-groups" (prn-str @items)))))
 
-
 ;(rf/dispatch [::selected-groups->local-storage])
+
+
+(rf/reg-event-fx
+  ::selected->local-storage
+  (fn [_ [_ sel-key collapsed]]
+    (when-not collapsed
+      (case sel-key
+        :geo-zones (rf/dispatch [::selected-zones->local-storage])
+        :groups (rf/dispatch [::selected-groups->local-storage])))))
 
 
 (defn- validate-loaded-selected-zones [items]

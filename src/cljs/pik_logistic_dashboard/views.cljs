@@ -84,7 +84,8 @@
   (let [collapsed (get-in @ui-state [ui-key :collapsed])]
     [:div.tool-header.bg-light {:class "text-primary"
                                 :on-click (fn []
-                                            (swap! ui-state update-in [ui-key :collapsed] not))}
+                                            (swap! ui-state update-in [ui-key :collapsed] not)
+                                            (rf/dispatch [::events/selected->local-storage ui-key collapsed]))}
      [:span.oi {:class (str icon (when-not collapsed " d-none"))}]
      [:span {:class (when collapsed "d-none")} label]]))
 
