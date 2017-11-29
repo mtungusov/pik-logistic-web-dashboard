@@ -12,6 +12,7 @@
             [pik-logistic-dashboard.subs :as subs]))
 
 (def base-url "https://dashboard-cars.pik-industry.ru")
+;(def base-url "http://localhost:3000")
 (def api-version "api/v4")
 (def dashboard-time-format "DD.MM.YY HH:mm")
 
