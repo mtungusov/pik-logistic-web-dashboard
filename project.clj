@@ -1,5 +1,5 @@
 (defproject pik-logistic-dashboard "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-RC1"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/clojurescript "1.9.946"]
                  [com.cognitect/transit-cljs "0.8.243"]
@@ -38,7 +38,7 @@
      :figwheel     {:on-jsload "pik-logistic-dashboard.core/mount-root"}
                     ;:websocket-host "192.168.225.241"}
      :compiler     {:main                 pik-logistic-dashboard.core
-                    :output-to            "resources/public/js/compiled/app-v0.2.4.js"
+                    :output-to            "resources/public/js/compiled/app-v0.2.5.js"
                     :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
                     :source-map-timestamp true
@@ -49,7 +49,7 @@
     {:id           "min"
      :source-paths ["src/cljs"]
      :compiler     {:main            pik-logistic-dashboard.core
-                    :output-to       "resources/public/js/compiled/app-v0.2.4.js"
+                    :output-to       "resources/public/js/compiled/app-v0.2.5.js"
                     :optimizations   :advanced
                     :closure-defines {goog.DEBUG false}
                     :pretty-print    false}}]})

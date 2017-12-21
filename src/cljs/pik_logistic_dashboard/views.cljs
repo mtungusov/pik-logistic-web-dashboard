@@ -140,8 +140,12 @@
      [:div.tool-header.bg-light {:class "text-primary"}
       [:a {:href "https://dashboard-cars.pik-industry.ru/charts/"
            :target "_blank"}
-       [:span.oi.oi-bar-chart]]]]]
+       [:span.oi.oi-bar-chart]]]]
+    [:div.chkbox-block
+     [:div.tool-header.bg-light {:class "text-primary"}
+      [:a {:href "https://dashboard-cars.pik-industry.ru/tables/"
+           :target "_blank"}
+       [:span.oi.oi-spreadsheet]]]]]
    [:div.col
     (status-bar)
     (list-trackers)]])
-
