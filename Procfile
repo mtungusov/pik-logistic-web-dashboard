@@ -1,2 +1,2 @@
-figwheel: rlwrap lein figwheel dev
+figwheel: lein do clean, with-profile dev figwheel
 sass: npm run scss
